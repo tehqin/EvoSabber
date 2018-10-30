@@ -24,4 +24,4 @@
 module load mono
 #Full path to executable
 
-mono ~/$USER/Mono/FracturingSabber/FracturingSabber/bin/Release/FracturingSabber.exe warlock
+mono ~/$USER/EvoSabber/FracturingSabber/FracturingSabber/bin/Release/FracturingSabber.exe warlock

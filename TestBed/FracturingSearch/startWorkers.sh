@@ -25,4 +25,4 @@
 module load mono
 #Full path to executable
 
-mono ~/$USER/Mono/DeckEvaluator/DeckEvaluator/bin/Release/DeckEvaluator.exe $SGE_TASK_ID 200 warlock
+mono ~/$USER/EvoSabber/DeckEvaluator/DeckEvaluator/bin/Release/DeckEvaluator.exe $SGE_TASK_ID 200 warlock
