@@ -1,0 +1,17 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapSabber", "MapSabber\MapSabber.csproj", "{561EF8E1-9DB8-4121-A9D9-6E470B8799EE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{561EF8E1-9DB8-4121-A9D9-6E470B8799EE}.Debug|x86.ActiveCfg = Debug|x86
+		{561EF8E1-9DB8-4121-A9D9-6E470B8799EE}.Debug|x86.Build.0 = Debug|x86
+		{561EF8E1-9DB8-4121-A9D9-6E470B8799EE}.Release|x86.ActiveCfg = Release|x86
+		{561EF8E1-9DB8-4121-A9D9-6E470B8799EE}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+EndGlobal
