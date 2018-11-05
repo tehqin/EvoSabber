@@ -24,4 +24,4 @@
 module load mono
 #Full path to executable
 
-mono ~/$USER/EvoSabber/MapSabber/MapSabber/bin/Release/MapSabber.exe warlock
+mono ~/EvoSabber/MapSabber/MapSabber/bin/Release/MapSabber.exe warlock
