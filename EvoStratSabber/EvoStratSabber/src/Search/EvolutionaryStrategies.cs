@@ -258,13 +258,6 @@ namespace EvoStratSabber.Search
             var elites = population.OrderBy(o => o.Fitness)
                .Reverse().Take(NUM_ELITES).ToList();
 
-            Console.WriteLine("POPULATION----");
-            foreach (var cur in population)
-               Console.WriteLine(cur.Fitness);
-            Console.WriteLine("ELITES--------");
-            foreach (var cur in elites)
-               Console.WriteLine(cur.Fitness);
-
             // Create new individuals.
             population.Clear();
             for (int numNew=0; numNew<POPULATION_SIZE; numNew++)
