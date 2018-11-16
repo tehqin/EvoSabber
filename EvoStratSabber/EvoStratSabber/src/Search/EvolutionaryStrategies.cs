@@ -22,10 +22,11 @@ namespace EvoStratSabber.Search
       private Random rnd = new Random();
 
       private int _individualsEvaluated;
+      private int _individualsDispatched;
 
       // MapElites Parameters
-      private const int POPULATION_SIZE = 100;
-      private const int NUM_GENERATIONS = 100;
+      private const int INITIAL_POPULATION = 100;
+      private const int NUM_TO_EVALUATE = 10000;
       private const int NUM_ELITES = 10;
 
       // Logging 
@@ -157,62 +158,10 @@ namespace EvoStratSabber.Search
          }
       }
 
-      private void EvaluateIndividuals(List<Individual> toEvaluate)
+	   private Individual ChooseElite(List<Individual> elites)
       {
-         var pendingIndividuals = new Queue<Individual>();
-         foreach (var curIndividual in toEvaluate)
-         {
-            pendingIndividuals.Enqueue(curIndividual);
-         }
-
-         int numComplete = 0;
-         while (numComplete < toEvaluate.Count)
-         {
-            // Find workers that can evaluate individuals.
-            FindNewWorkers(); 
-         
-            // Dispatch jobs to available workers.
-            while (_idleWorkers.Count > 0 &&
-                   pendingIndividuals.Count > 0)
-            {
-               var curIndividual = pendingIndividuals.Dequeue();
-               int workerId = _idleWorkers.Dequeue();
-               _runningWorkers.Enqueue(workerId);
-               Console.WriteLine("Starting worker: "+workerId);
-
-               string inboxPath = string.Format(_inboxTemplate, workerId);
-               SendWork(inboxPath, curIndividual);
-               _individualStable[workerId] = curIndividual;
-            }
-
-            // Look for individuals that are done.
-            int numActiveWorkers = _runningWorkers.Count;
-            for (int i=0; i<numActiveWorkers; i++)
-            {
-               int workerId = _runningWorkers.Dequeue();
-               string outboxPath = 
-                  string.Format(_outboxTemplate, workerId);
-
-               // Test if this worker is done.
-               if (File.Exists(outboxPath))
-               {
-                  // Wait for the file to finish being written.
-                  Console.WriteLine("Worker done: " + workerId);
-                  Thread.Sleep(1000);
-
-                  ReceiveResults(outboxPath, _individualStable[workerId]);
-                  _idleWorkers.Enqueue(workerId);
-                  _individualsEvaluated++;
-                  numComplete++;
-               }
-               else
-               {
-                  _runningWorkers.Enqueue(workerId);
-               }
-            }
-         
-            Thread.Sleep(5000);
-         }
+         int pos = rnd.Next(elites.Count);
+         return elites[pos];
       }
 
       private void InitLogs()
@@ -233,6 +182,7 @@ namespace EvoStratSabber.Search
          _runningWorkers = new Queue<int>();
          _idleWorkers = new Queue<int>();
          _individualStable = new Dictionary<int,Individual>();
+         var population = new List<Individual>();
          
          // Let the workers know we are here.
 			using (FileStream ow = File.Open(_activeSearchPath,
@@ -244,37 +194,73 @@ namespace EvoStratSabber.Search
 
          // Setup the logs to record the data on individuals
          InitLogs();
-         
-         // Generate an initial population and evaluate them.
-         var population = new List<Individual>();
-         for (int i=0; i<POPULATION_SIZE; i++)
-            population.Add(Individual.GenerateRandomIndividual(_cardSet));
-         EvaluateIndividuals(population);
 
          Console.WriteLine("Begin search...");
-         for (int curGen=1; curGen<=NUM_GENERATIONS; curGen++)
+         while (_individualsEvaluated < NUM_TO_EVALUATE)
          {
+				FindNewWorkers();
+            
             // Grab the elites.
             var elites = population.OrderBy(o => o.Fitness)
                .Reverse().Take(NUM_ELITES).ToList();
 
-            // Create new individuals.
-            population.Clear();
-            for (int numNew=0; numNew<POPULATION_SIZE; numNew++)
+            // Disbatch jobs to the available workers.
+            while (_idleWorkers.Count > 0)
             {
-               int pos = rnd.Next(NUM_ELITES);
-               Individual parent = elites[pos];
-               population.Add(parent.Mutate());
+               if (_individualsDispatched >= INITIAL_POPULATION &&
+                   _individualsEvaluated == 0)
+               {
+                  break;
+               }
+
+               int workerId = _idleWorkers.Dequeue();
+               _runningWorkers.Enqueue(workerId);
+               Console.WriteLine("Starting worker: "+workerId);
+
+               Individual choiceIndividual =
+                  _individualsDispatched < INITIAL_POPULATION ?
+                     Individual.GenerateRandomIndividual(_cardSet) :
+                     ChooseElite(elites).Mutate();
+
+               string inboxPath = string.Format(_inboxTemplate, workerId);
+               SendWork(inboxPath, choiceIndividual);
+               _individualStable[workerId] = choiceIndividual;
+               _individualsDispatched++;
             }
-            
-            // Evaluate the individuals.
-            EvaluateIndividuals(population);
-         
+
+            // Look for individuals that are done.
+				population.Clear();
+            int numActiveWorkers = _runningWorkers.Count;
+            for (int i=0; i<numActiveWorkers; i++)
+            {
+               int workerId = _runningWorkers.Dequeue();
+               string outboxPath = string.Format(_outboxTemplate, workerId);
+
+               // Test if this worker is done.
+               if (File.Exists(outboxPath))
+               {
+                  // Wait for the file to finish being written.
+                  Console.WriteLine("Worker done: " + workerId);
+                  Thread.Sleep(1000);
+
+                  ReceiveResults(outboxPath, _individualStable[workerId]);
+                  population.Add(_individualStable[workerId]);
+                  _idleWorkers.Enqueue(workerId);
+                  _individualsEvaluated++;
+               }
+               else
+               {
+                  _runningWorkers.Enqueue(workerId);
+               }
+            }
+
             // Add the elites back in.
             foreach (var curElite in elites)
             {
                population.Add(curElite);
             }
+
+            Thread.Sleep(5000);
          }
 
          // Let the workers know that we are done.
