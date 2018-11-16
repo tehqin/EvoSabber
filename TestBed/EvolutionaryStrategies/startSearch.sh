@@ -5,7 +5,7 @@
 #        
 
 # -- our name ---
-#$ -N MapElites
+#$ -N EvolutionaryStrategies
 #$ -S /bin/sh
 # Make sure that the .e and .o file arrive in the
 #working directory
