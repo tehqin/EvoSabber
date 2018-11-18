@@ -183,8 +183,7 @@ namespace DeckEvaluator.Evaluation
                   // Record some stats
                   if (task.PlayerTaskType == PlayerTaskType.PLAY_CARD)
                      updateUsage(task.Source.Card);
-                  if (task.PlayerTaskType == PlayerTaskType.HERO_ATTACK ||
-                      task.PlayerTaskType == PlayerTaskType.MINION_ATTACK)
+                  if (task.PlayerTaskType == PlayerTaskType.MINION_ATTACK)
                   {
                      int damageTaken = ((ICharacter)task.Source).AttackDamage;
                      totalDamage += damageTaken;
