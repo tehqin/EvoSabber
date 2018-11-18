@@ -1,4 +1,3 @@
-
 namespace MapSabber.Config
 {
    class Configuration
