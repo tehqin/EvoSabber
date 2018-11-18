@@ -9,6 +9,7 @@ using SabberStoneCore.Model;
 
 using MapSabber.Logging;
 using MapSabber.Mapping;
+using MapSabber.Mapping.Sizers;
 
 namespace MapSabber.Search
 {
@@ -96,7 +97,7 @@ namespace MapSabber.Search
          cur.StrategyAlignment = Int32.Parse(textLines[8]);
          
          // Save which elements are relevant to the search
-         cur.Features = new []{cur.DamageDone, cur.NumTurns};
+         cur.Features = new []{cur.StrategyAlignment, cur.NumTurns};
          cur.Fitness = cur.TotalHealthDifference;
 
          Console.WriteLine("------------------");
@@ -182,8 +183,9 @@ namespace MapSabber.Search
                NUM_GROUPS_PER_FEATURE, new int[]{4382,2280},
                new int[]{6352,2889});
          */
+         var mapSizer = new LinearMapSizer(2, 20);
          var featureMap = new SlidingFeatureMap(NUM_FEATURES,
-               REMAP_FREQUENCY, NUM_GROUPS_PER_FEATURE);
+               REMAP_FREQUENCY, NUM_TO_EVALUATE, mapSizer);
          var individualStable = new Dictionary<int,Individual>();
          
          // Setup the logs to record the data on individuals

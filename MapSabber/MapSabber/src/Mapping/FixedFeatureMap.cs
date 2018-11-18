@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
+using MapSabber.Mapping.Sizers;
 using MapSabber.Search;
 
 /* This is a FeatureMap that has fixed boundaries at even intervals.
@@ -13,6 +14,10 @@ namespace MapSabber.Mapping
    class FixedFeatureMap : FeatureMap
    {
       private static Random rnd = new Random();
+      private List<Individual> _allIndividuals; 
+
+      private MapSizer _groupSizer; 
+      private int _maxIndividualsToEvaluate;
 
       public int NumGroups { get; private set; }
       public int NumFeatures { get; private set; }
@@ -23,23 +28,22 @@ namespace MapSabber.Mapping
       private int[] _lowGroupBound;
       private int[] _highGroupBound;
 
-      public FixedFeatureMap(int numFeatures, int numGroups, 
-            int[] lowGroupBound, int[] highGroupBound)
+      public FixedFeatureMap(int numFeatures, int maxIndividualsToEvaluate, 
+            MapSizer groupSizer, int[] lowGroupBound, int[] highGroupBound)
       {
+         _allIndividuals = new List<Individual>();
+         _groupSizer = groupSizer;
+         _maxIndividualsToEvaluate = maxIndividualsToEvaluate;
+         NumGroups = -1;
+
          NumFeatures = numFeatures;
-         NumGroups = numGroups;
          _lowGroupBound = new int[numFeatures];
          _highGroupBound = new int[numFeatures];
          Array.Copy(lowGroupBound, _lowGroupBound, numFeatures);
          Array.Copy(highGroupBound, _highGroupBound, numFeatures);
-      
-         // Populate the feature map using the new boundaries.
-         _eliteIndices = new List<string>();
-         EliteMap = new Dictionary<string,Individual>();
-         CellCount = new Dictionary<string,int>();
       }
 
-      private int getFeatureIndex(int featureId, int feature)
+      private int GetFeatureIndex(int featureId, int feature)
       {
          if (feature <= _lowGroupBound[featureId])
             return 0;
@@ -51,12 +55,12 @@ namespace MapSabber.Mapping
          int index = NumGroups * pos / gap;
          return index;
       }
-
-      public void Add(Individual toAdd)
+  
+      private void AddToMap(Individual toAdd)
       {
          var features = new int[NumFeatures];
          for (int i=0; i<NumFeatures; i++)
-            features[i] = getFeatureIndex(i, toAdd.Features[i]);
+            features[i] = GetFeatureIndex(i, toAdd.Features[i]);
          string index = string.Join(":", features);
      
          if (!EliteMap.ContainsKey(index))
@@ -71,6 +75,32 @@ namespace MapSabber.Mapping
          }
 
          CellCount[index] += 1;
+      }
+
+      private void Remap(int nextNumGroups)
+      {
+         // Update the new group size
+         NumGroups = nextNumGroups;
+
+         // Repopulate the map
+         _eliteIndices = new List<string>();
+         EliteMap = new Dictionary<string,Individual>();
+         CellCount = new Dictionary<string,int>();
+         foreach (Individual cur in _allIndividuals)
+            AddToMap(cur);
+      }
+
+      public void Add(Individual toAdd)
+      {
+         _allIndividuals.Add(toAdd);
+
+         double portionDone = 
+            1.0 * _allIndividuals.Count / _maxIndividualsToEvaluate;
+         int nextNumGroups = _groupSizer.GetSize(portionDone);
+         if (nextNumGroups != NumGroups)
+            Remap(nextNumGroups);
+         else
+            AddToMap(toAdd);
       }
 
       public Individual GetRandomElite()

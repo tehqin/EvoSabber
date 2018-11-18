@@ -7,6 +7,7 @@ using SabberStoneCore.Enums;
 using SabberStoneCore.Model;
 
 using MapSabber.Search;
+using MapSabber.Mapping.Sizers;
 
 namespace MapSabber
 {

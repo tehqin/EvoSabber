@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
+using MapSabber.Mapping.Sizers;
 using MapSabber.Search;
 
 /* This is a FeatureMap that slide's its feature boundaries periodically.
@@ -16,6 +17,8 @@ namespace MapSabber.Mapping
       private static Random rnd = new Random();
       private List<Individual> _allIndividuals;
 
+      private MapSizer _groupSizer;
+      private int _maxIndividualsToEvaluate;
       private int _remapFrequency;
 
       public int NumGroups { get; private set; }
@@ -27,17 +30,18 @@ namespace MapSabber.Mapping
       private List<string> _eliteIndices;
 
       public SlidingFeatureMap(int numFeatures, int remapFrequency,
-                        int numGroups)
+                int maxIndividualsToEvaluate, MapSizer groupSizer)
       {
          _allIndividuals = new List<Individual>();
+         _groupSizer = groupSizer;
+         _maxIndividualsToEvaluate = maxIndividualsToEvaluate;
          _remapFrequency = remapFrequency;
          NumFeatures = numFeatures;
-         NumGroups = numGroups;
       
          _groupBoundaries = new List<int>[NumFeatures];
       }
 
-      private int getFeatureIndex(int featureId, int feature)
+      private int GetFeatureIndex(int featureId, int feature)
       {
          // Find the bucket index we belong on this dimension
          int index = 0;
@@ -54,7 +58,7 @@ namespace MapSabber.Mapping
       {
          var features = new int[NumFeatures];
          for (int i=0; i<NumFeatures; i++)
-            features[i] = getFeatureIndex(i, toAdd.Features[i]);
+            features[i] = GetFeatureIndex(i, toAdd.Features[i]);
          string index = string.Join(":", features);
      
          if (!EliteMap.ContainsKey(index))
@@ -75,6 +79,9 @@ namespace MapSabber.Mapping
       // Add all the individuals available to the map.
       private void Remap()
       {
+         double portionDone = 1.0 * _allIndividuals.Count / _maxIndividualsToEvaluate;
+         NumGroups = _groupSizer.GetSize(portionDone);
+
          var features = new List<int>[NumFeatures];
          for (int i=0; i<NumFeatures; i++)
             features[i] = new List<int>();

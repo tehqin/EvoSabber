@@ -44,6 +44,8 @@
     <Compile Include="src\Mapping\FeatureMap.cs" />
     <Compile Include="src\Mapping\FixedFeatureMap.cs" />
     <Compile Include="src\Mapping\SlidingFeatureMap.cs" />
+    <Compile Include="src\Mapping\Sizers\MapSizer.cs" />
+    <Compile Include="src\Mapping\Sizers\LinearMapSizer.cs" />
     <Compile Include="src\Search\MapElites.cs" />
     <Compile Include="src\Search\Individual.cs" />
   </ItemGroup>
