@@ -33,12 +33,17 @@
     <Reference Include="SabberStoneCore">
       <HintPath>..\..\SharedLib\SabberStoneCore.dll</HintPath>
     </Reference>
+    <Reference Include="SabberStoneCore">
+      <HintPath>..\..\SharedLib\Nett.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\Program.cs" />
+    <Compile Include="src\Config\Configuration.cs" />
+    <Compile Include="src\Config\CardReader.cs" />
     <Compile Include="src\Logging\FrequentMapLog.cs" />
     <Compile Include="src\Logging\RunningIndividualLog.cs" />
     <Compile Include="src\Mapping\FeatureMap.cs" />

@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
 
 using MapSabber.Search;
 
@@ -12,5 +10,10 @@ namespace MapSabber.Mapping
       int NumFeatures { get; }
       Dictionary<string, Individual> EliteMap { get; }
       Dictionary<string, int> CellCount { get; }
+
+      void Add(Individual toAdd);
+      Individual GetRandomElite();
+
+      void LogMap(string logFilename);
    }
 }

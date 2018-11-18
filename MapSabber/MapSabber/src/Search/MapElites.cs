@@ -4,9 +4,12 @@ using System.IO;
 using System.Text;
 using System.Threading;
 
+using Nett;
+
 using SabberStoneCore.Enums;
 using SabberStoneCore.Model;
 
+using MapSabber.Config;
 using MapSabber.Logging;
 using MapSabber.Mapping;
 using MapSabber.Mapping.Sizers;
@@ -22,13 +25,13 @@ namespace MapSabber.Search
 
       private int _individualsEvaluated;
       private int _individualsDispatched;
-      
+
+      FeatureMap _featureMap;
+      Dictionary<int, Individual> _individualStable;
+
       // MapElites Parameters
-      private const int INITIAL_POPULATION = 100;
-      private const int NUM_TO_EVALUATE = 10000;
-      private const int REMAP_FREQUENCY = 100;
-      private const int NUM_GROUPS_PER_FEATURE = 20;
-      private const int NUM_FEATURES = 2;
+      private string _configFilename;
+      private SearchParams _params;
 
       // Logging 
       private const string LOG_DIRECTORY = "logs/";
@@ -47,12 +50,42 @@ namespace MapSabber.Search
       private RunningIndividualLog _championLog;
       private RunningIndividualLog _fittestLog;
 
-      public MapElites(CardClass heroClass, List<Card> cardSet)
+      public MapElites(string configFilename)
       {
-         _heroClass = heroClass;
-         _cardSet = cardSet;
+         // Grab the configuration info
+         _configFilename = configFilename;
+         var config = Toml.ReadFile<Configuration>(_configFilename);
+         _params = config.Search;
+   
+         // Configuration for the search space
+         _heroClass = CardReader.GetClassFromName(config.Deckspace.HeroClass);
+         _cardSet = CardReader.GetCards(_heroClass);
+         Console.WriteLine("Hero Class: "+_heroClass);
+      
+         InitLogs();
+         InitMap(config);
       }
 
+      private void InitLogs()
+      {
+         _individualLog =
+            new RunningIndividualLog(INDIVIDUAL_LOG_FILENAME);
+         _championLog =
+            new RunningIndividualLog(CHAMPION_LOG_FILENAME);
+         _fittestLog =
+            new RunningIndividualLog(FITTEST_LOG_FILENAME);
+      }
+
+      private void InitMap(Configuration config)
+      {
+         var mapSizer = new LinearMapSizer(2, 20);
+         _featureMap = new SlidingFeatureMap(config, mapSizer);
+         _individualStable = new Dictionary<int,Individual>();
+         
+         // Setup the logs to record the data on individuals
+         _map_log = new FrequentMapLog(ELITE_MAP_FILENAME, _featureMap);
+      }
+         
       private static void WriteText(Stream fs, string s)
       {
          s += "\n";
@@ -131,26 +164,7 @@ namespace MapSabber.Search
          if (didHitMaxFitness)
             _fittestLog.LogIndividual(cur);
       }
-
-      private void InitLogs()
-      {
-         _individualLog =
-            new RunningIndividualLog(INDIVIDUAL_LOG_FILENAME);
-         _championLog =
-            new RunningIndividualLog(CHAMPION_LOG_FILENAME);
-         _fittestLog =
-            new RunningIndividualLog(FITTEST_LOG_FILENAME);
-      }
-
-      private void LogIndividual(string filepath, string[] data)
-      {
-         using (StreamWriter sw = File.AppendText(filepath))
-         {
-            sw.WriteLine(string.Join(",", data));
-            sw.Close();
-         }
-      }
-
+      
       public void Run()
       {
          _individualsEvaluated = 0;
@@ -175,25 +189,12 @@ namespace MapSabber.Search
 						FileMode.Create, FileAccess.Write, FileShare.None))
 			{
 				WriteText(ow, "MAP Elites");
+				WriteText(ow, _configFilename);
 				ow.Close();
 			}
 
-         /*
-         var featureMap = new FixedFeatureMap(NUM_FEATURES,
-               NUM_GROUPS_PER_FEATURE, new int[]{4382,2280},
-               new int[]{6352,2889});
-         */
-         var mapSizer = new LinearMapSizer(2, 20);
-         var featureMap = new SlidingFeatureMap(NUM_FEATURES,
-               REMAP_FREQUENCY, NUM_TO_EVALUATE, mapSizer);
-         var individualStable = new Dictionary<int,Individual>();
-         
-         // Setup the logs to record the data on individuals
-         InitLogs();
-         _map_log = new FrequentMapLog(ELITE_MAP_FILENAME, featureMap);
-         
          Console.WriteLine("Begin search...");
-         while (_individualsEvaluated < NUM_TO_EVALUATE)
+         while (_individualsEvaluated < _params.NumToEvaluate)
          {
             // Look for new workers.
             string[] hailingFiles = Directory.GetFiles(activeDirectory);
@@ -208,7 +209,7 @@ namespace MapSabber.Search
                   string label = activeFile.Substring(start, end-start);
                   int workerId = Int32.Parse(label);
                   _idleWorkers.Enqueue(workerId);
-                  individualStable.Add(workerId, null);
+                  _individualStable.Add(workerId, null);
                   File.Delete(activeFile);
                   Console.WriteLine("Found worker " + workerId);
                }
@@ -217,7 +218,7 @@ namespace MapSabber.Search
             // Dispatch jobs to the available workers.
             while (_idleWorkers.Count > 0)
             {
-               if (_individualsDispatched >= INITIAL_POPULATION &&
+               if (_individualsDispatched >= _params.InitialPopulation &&
                    _individualsEvaluated == 0)
                {
                   break;
@@ -228,13 +229,13 @@ namespace MapSabber.Search
 					Console.WriteLine("Starting worker: "+workerId);
                
                Individual choiceIndividual =
-                  _individualsDispatched < INITIAL_POPULATION ? 
+                  _individualsDispatched < _params.InitialPopulation ? 
                      Individual.GenerateRandomIndividual(_cardSet) :
-                     featureMap.GetRandomElite().Mutate();
+                     _featureMap.GetRandomElite().Mutate();
 
                string inboxPath = string.Format(inboxTemplate, workerId);
                SendWork(inboxPath, choiceIndividual);
-               individualStable[workerId] = choiceIndividual;
+               _individualStable[workerId] = choiceIndividual;
                _individualsDispatched++;
             }
 
@@ -252,8 +253,8 @@ namespace MapSabber.Search
 						Console.WriteLine("Worker done: " + workerId);
 						Thread.Sleep(1000);
 
-						ReceiveResults(outboxPath, individualStable[workerId]);
-						featureMap.Add(individualStable[workerId]);
+						ReceiveResults(outboxPath, _individualStable[workerId]);
+						_featureMap.Add(_individualStable[workerId]);
 						_idleWorkers.Enqueue(workerId);
 						_individualsEvaluated++;
                   _map_log.UpdateLog();
@@ -272,7 +273,7 @@ namespace MapSabber.Search
          File.Delete(activeSearchPath);
 
          // Create a log that has all of the elites.
-         featureMap.LogMap(ELITES_FILENAME); 
+         _featureMap.LogMap(ELITES_FILENAME); 
       }
    }
 }

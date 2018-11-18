@@ -4,9 +4,12 @@ using System.IO;
 using System.Text;
 using System.Threading;
 
+using Nett;
+
 using SabberStoneCore.Enums;
 using SabberStoneCore.Model;
 
+using DeckEvaluator.Config;
 using DeckEvaluator.Evaluation;
 
 namespace DeckEvaluator
@@ -17,11 +20,7 @@ namespace DeckEvaluator
       {
          string nodeName = args[0];
          int nodeId = Int32.Parse(args[0]);
-         int numGames = Int32.Parse(args[1]);
-         string opponentDeckClassName = args[2];
          Console.WriteLine("Node Id: "+nodeId);
-         Console.WriteLine("Num games: "+numGames);
-         Console.WriteLine("Opponent Deck Class: "+opponentDeckClassName);
 			
          // These files are for asyncronous communication between this
          // worker and it's scheduler. 
@@ -33,24 +32,33 @@ namespace DeckEvaluator
             string.Format("deck-{0,4:D4}-inbox.txt", nodeId);
          string outboxPath = boxesDirectory +
             string.Format("deck-{0,4:D4}-outbox.txt", nodeId);
-         string starterDeckTemplate = 
-            "resources/starterDecks/starter_{0}.txt";
-			string opponentDeckPath = 
-            string.Format(starterDeckTemplate, opponentDeckClassName);
-        
+			
          // Hailing
          string activeDirectory = "active/";
          string activeWorkerPath = activeDirectory + 
             string.Format("worker-{0,4:D4}.txt", nodeId);
          string activeSearchPath = activeDirectory + "search.txt";
+         if (!File.Exists(activeSearchPath))
+         {
+            Console.WriteLine("No search has been found.");
+            return;
+         }
 
          // The opponent deck doesn't change so we can load it here.
+         string[] textLines = File.ReadAllLines(activeSearchPath);
+         var config = Toml.ReadFile<Configuration>(textLines[1]);
+         string opponentDeckPath = config.Evaluation.Opponent.DeckFile;
          List<Card> opponentDeck = GetDeckFromFile(opponentDeckPath);
          CardClass opponentClass = GetClassFromFile(opponentDeckPath);
+         int numGames = config.Evaluation.NumGames;
+         Console.WriteLine("Config File: " + textLines[1]);
+         Console.WriteLine("Deck File: " + opponentDeckPath);
+         Console.WriteLine("Opponent Hero Class: " + opponentClass);
+         Console.WriteLine("Num games: "+numGames);
         
          // Setup this worker to use all 8 cores on the node.
          // If this fails, don't go any further.
-         if (!configureThreadPool(8))
+         if (!ConfigureThreadPool(8))
             return;
 
          // Let the scheduler know we are here.
@@ -108,7 +116,7 @@ namespace DeckEvaluator
          fs.Write(info, 0, info.Length);
       }
 
-      private static bool configureThreadPool(int maxThreads)
+      private static bool ConfigureThreadPool(int maxThreads)
       {
          int maxWorker, maxIOC;
          ThreadPool.GetMaxThreads(out maxWorker, out maxIOC);

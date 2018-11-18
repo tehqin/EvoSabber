@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
+using MapSabber.Config;
 using MapSabber.Mapping.Sizers;
 using MapSabber.Search;
 
-/* This is a FeatureMap that slide's its feature boundaries periodically.
+/* This is a FeatureMap that slides its feature boundaries periodically.
  * Instead of having even feature boundaries, they are readjusted so that
  * each group is more evenly distributed.
  */
@@ -29,14 +30,13 @@ namespace MapSabber.Mapping
       private List<int>[] _groupBoundaries;
       private List<string> _eliteIndices;
 
-      public SlidingFeatureMap(int numFeatures, int remapFrequency,
-                int maxIndividualsToEvaluate, MapSizer groupSizer)
+      public SlidingFeatureMap(Configuration config, MapSizer groupSizer)
       {
          _allIndividuals = new List<Individual>();
          _groupSizer = groupSizer;
-         _maxIndividualsToEvaluate = maxIndividualsToEvaluate;
-         _remapFrequency = remapFrequency;
-         NumFeatures = numFeatures;
+         _maxIndividualsToEvaluate = config.Search.NumToEvaluate;
+         _remapFrequency = config.Map.RemapFrequency;
+         NumFeatures = config.Map.NumFeatures;
       
          _groupBoundaries = new List<int>[NumFeatures];
       }
