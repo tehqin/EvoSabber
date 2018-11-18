@@ -4,9 +4,12 @@ using System.IO;
 using System.Text;
 using System.Threading;
 
+using Nett;
+
 using SabberStoneCore.Enums;
 using SabberStoneCore.Model;
 
+using FracturingSabber.Config;
 using FracturingSabber.Logging;
 using FracturingSabber.Population;
 
@@ -24,9 +27,8 @@ namespace FracturingSabber.Search
       private int _individualsDispatched;
       
       // FracturingSearch Parameters
-      private const int INITIAL_POPULATION = 1;
-      private const int NUM_TO_EVALUATE = 10000;
-      private const int MAX_POPULATION = 1000000;
+      private string _configFilename;
+      private SearchParams _params;
 
       // Logging
       private static readonly string _logDirectory = "logs/";
@@ -34,10 +36,25 @@ namespace FracturingSabber.Search
          _logDirectory + "individual_log.csv";
       private RunningIndividualLog _individualLog;
 
-      public FracturingSearch(CardClass heroClass, List<Card> cardSet)
+      public FracturingSearch(string configFilename)
       {
-         _heroClass = heroClass;
-         _cardSet = cardSet; 
+         // Grab the configuration info
+         _configFilename = configFilename;
+         var config = Toml.ReadFile<Configuration>(_configFilename);
+         _params = config.Search;
+
+         // Configuration for the search space
+         _heroClass = CardReader.GetClassFromName(config.Deckspace.HeroClass);
+         _cardSet = CardReader.GetCards(_heroClass);
+         Console.WriteLine("Hero Class: "+_heroClass);
+      
+         InitLogs();
+		}
+
+      private void InitLogs()
+      {
+         _individualLog =
+            new RunningIndividualLog(INDIVIDUAL_LOG_FILENAME);
       }
 
       private static void WriteText(Stream fs, string s)
@@ -121,12 +138,6 @@ namespace FracturingSabber.Search
          _individualLog.LogIndividual(cur);
       }
 
-      private void InitLogs()
-      {
-         _individualLog =
-            new RunningIndividualLog(INDIVIDUAL_LOG_FILENAME);
-      }
-
       public void Run()
       {
          _individualsEvaluated = 0;
@@ -151,26 +162,24 @@ namespace FracturingSabber.Search
                   FileMode.Create, FileAccess.Write, FileShare.None))
          {
             WriteText(ow, "Fracturing Search");
+            WriteText(ow, _configFilename);
             ow.Close();
          }
          
          int numWorkers = 0;
          var shardStable = new Dictionary<int,Shard>();
-         var population = new MapPopulation(MAX_POPULATION);
-         //var population = new FittestPopulation(MAX_POPULATION);
-
-         // Setup the logs to record the data on individuals
-         InitLogs();
+         var population = new MapPopulation(_params.MaxPopulation);
+         //var population = new FittestPopulation(_params.MaxPopulation);
 
          // Generate the initial population.
-         for (int curInd=0; curInd<INITIAL_POPULATION; curInd++)
+         for (int curInd=0; curInd<_params.InitialPopulation; curInd++)
          {
             Shard curShard = Shard.GenerateInitialShard(_cardSet);
             _pendingEval.Enqueue(curShard);
          }
 
          Console.WriteLine("Begin search...");
-         while (_individualsEvaluated < NUM_TO_EVALUATE)
+         while (_individualsEvaluated < _params.NumToEvaluate)
          {
             // Look for new workers.
             string[] hailingFiles = Directory.GetFiles(activeDirectory);
@@ -250,7 +259,6 @@ namespace FracturingSabber.Search
                {
                   _runningWorkers.Enqueue(workerId);
                }
-            
             }
 
             Thread.Sleep(5000);

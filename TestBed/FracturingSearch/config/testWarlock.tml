@@ -1,0 +1,13 @@
+[Evaluation]
+NumGames = 1
+
+[Evaluation.Opponent]
+DeckFile = "resources/starterDecks/starter_warlock.txt"
+
+[Deckspace]
+HeroClass = "warlock"
+
+[Search]
+InitialPopulation = 1
+NumToEvaluate = 10000
+MaxPopulation = 1000000
