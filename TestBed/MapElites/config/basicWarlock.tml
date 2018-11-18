@@ -1,0 +1,16 @@
+[Evaluation]
+NumGames = 200
+
+[Evaluation.Opponent]
+DeckFile = "resources/starterDecks/starter_warlock.txt"
+
+[Deckspace]
+HeroClass = "warlock"
+
+[Search]
+InitialPopulation = 100
+NumToEvaluate = 10000
+
+[Map]
+RemapFrequency = 100
+NumFeatures = 2   
