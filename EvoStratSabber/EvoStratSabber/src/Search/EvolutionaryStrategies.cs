@@ -5,9 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
+using Nett;
+
 using SabberStoneCore.Enums;
 using SabberStoneCore.Model;
 
+using EvoStratSabber.Config;
 using EvoStratSabber.Logging;
 
 namespace EvoStratSabber.Search
@@ -24,10 +27,9 @@ namespace EvoStratSabber.Search
       private int _individualsEvaluated;
       private int _individualsDispatched;
 
-      // MapElites Parameters
-      private const int INITIAL_POPULATION = 100;
-      private const int NUM_TO_EVALUATE = 10000;
-      private const int NUM_ELITES = 10;
+      // ES Parameters
+      private string _configFilename;
+      private SearchParams _params;
 
       // Logging 
       private const string LOG_DIRECTORY = "logs/";
@@ -53,12 +55,31 @@ namespace EvoStratSabber.Search
       private const string _activeSearchPath = _activeDirectory
          + "search.txt";
          
-      public EvolutionaryStrategies(CardClass heroClass, List<Card> cardSet)
+      public EvolutionaryStrategies(string configFilename)
       {
-         _heroClass = heroClass;
-         _cardSet = cardSet;
+         // Grab the config info
+         _configFilename = configFilename;
+         var config = Toml.ReadFile<Configuration>(_configFilename);
+         _params = config.Search;
+
+         // Configure the search space
+         _heroClass = CardReader.GetClassFromName(config.Deckspace.HeroClass);
+         _cardSet = CardReader.GetCards(_heroClass);
+         
+         // Setup the logs to record the data on individuals
+         InitLogs();
       }
 
+      private void InitLogs()
+      {
+         _individualLog =
+            new RunningIndividualLog(INDIVIDUAL_LOG_FILENAME);
+         _championLog =
+            new RunningIndividualLog(CHAMPION_LOG_FILENAME);
+         _fittestLog =
+            new RunningIndividualLog(FITTEST_LOG_FILENAME);
+      }
+      
       private static void WriteText(Stream fs, string s)
       {
          s += "\n";
@@ -164,16 +185,6 @@ namespace EvoStratSabber.Search
          return elites[pos];
       }
 
-      private void InitLogs()
-      {
-         _individualLog =
-            new RunningIndividualLog(INDIVIDUAL_LOG_FILENAME);
-         _championLog =
-            new RunningIndividualLog(CHAMPION_LOG_FILENAME);
-         _fittestLog =
-            new RunningIndividualLog(FITTEST_LOG_FILENAME);
-      }
-
       public void Run()
       {
          _individualsEvaluated = 0;
@@ -189,25 +200,23 @@ namespace EvoStratSabber.Search
 						FileMode.Create, FileAccess.Write, FileShare.None))
 			{
 				WriteText(ow, "Evolutionary Strategies");
+				WriteText(ow, _configFilename);
 				ow.Close();
 			}
 
-         // Setup the logs to record the data on individuals
-         InitLogs();
-
          Console.WriteLine("Begin search...");
-         while (_individualsEvaluated < NUM_TO_EVALUATE)
+         while (_individualsEvaluated < _params.NumToEvaluate)
          {
 				FindNewWorkers();
             
             // Grab the elites.
             var elites = population.OrderBy(o => o.Fitness)
-               .Reverse().Take(NUM_ELITES).ToList();
+               .Reverse().Take(_params.NumElites).ToList();
 
             // Disbatch jobs to the available workers.
             while (_idleWorkers.Count > 0)
             {
-               if (_individualsDispatched >= INITIAL_POPULATION &&
+               if (_individualsDispatched >= _params.InitialPopulation &&
                    _individualsEvaluated == 0)
                {
                   break;
@@ -218,7 +227,7 @@ namespace EvoStratSabber.Search
                Console.WriteLine("Starting worker: "+workerId);
 
                Individual choiceIndividual =
-                  _individualsDispatched < INITIAL_POPULATION ?
+                  _individualsDispatched < _params.InitialPopulation ?
                      Individual.GenerateRandomIndividual(_cardSet) :
                      ChooseElite(elites).Mutate();
 
