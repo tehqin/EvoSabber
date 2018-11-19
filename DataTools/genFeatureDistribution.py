@@ -8,7 +8,8 @@ import csv
 import glob
 import seaborn as sns
 
-feature1_index = 7
+#feature1_index = 7
+feature1_index = 3
 feature1_label = 'None'
 feature2_index = 4
 feature2_label = 'None'

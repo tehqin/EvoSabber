@@ -9,6 +9,7 @@ namespace FracturingSabber.Config
    class DeckspaceParams
    {
       public string HeroClass { get; set; }
+      public string[] CardSets { get; set; }
    }
 
    class SearchParams

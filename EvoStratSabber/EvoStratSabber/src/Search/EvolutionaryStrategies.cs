@@ -64,7 +64,8 @@ namespace EvoStratSabber.Search
 
          // Configure the search space
          _heroClass = CardReader.GetClassFromName(config.Deckspace.HeroClass);
-         _cardSet = CardReader.GetCards(_heroClass);
+         CardSet[] sets = CardReader.GetSetsFromNames(config.Deckspace.CardSets);
+         _cardSet = CardReader.GetCards(_heroClass, sets);
          
          // Setup the logs to record the data on individuals
          InitLogs();

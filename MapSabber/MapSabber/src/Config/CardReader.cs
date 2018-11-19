@@ -22,7 +22,20 @@ namespace MapSabber.Config
          return CardClass.NEUTRAL;
       }
 
-		public static List<Card> GetCards(CardClass heroClass)
+      public static CardSet[] GetSetsFromNames(string[] cardSets)
+      {
+         Console.WriteLine(String.Join(" ", cardSets));
+         var sets = new CardSet[cardSets.Length];
+
+         for (int i=0; i<cardSets.Length; i++)
+            foreach (CardSet c in Enum.GetValues(typeof(CardSet)))
+               if (c.ToString().Equals(cardSets[i]))
+                  sets[i] = c;
+
+         return sets;
+      }
+
+		public static List<Card> GetCards(CardClass heroClass, CardSet[] sets)
       {
          var hs = new HashSet<Card>();
          var cards = new List<Card>();
@@ -31,7 +44,6 @@ namespace MapSabber.Config
          {
             if (c != Cards.FromName("Default")
                 && c.Implemented
-                && c.Set == CardSet.CORE
                 && c.Collectible
                 && c.Type != CardType.HERO
                 && c.Type != CardType.ENCHANTMENT
@@ -41,8 +53,15 @@ namespace MapSabber.Config
                 && (c.Class == CardClass.NEUTRAL || c.Class == heroClass)
                 && !hs.Contains(c))
             {
-               cards.Add(c);
-               hs.Add(c);
+					bool validSet = false;
+               foreach (CardSet curSet in sets)
+						validSet |= (c.Set == curSet);
+
+               if (validSet)
+               {
+                  cards.Add(c);
+                  hs.Add(c);
+               }
             }
          }
 

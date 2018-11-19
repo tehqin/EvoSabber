@@ -2,11 +2,11 @@
 NumGames = 200
 
 [Evaluation.Opponent]
-DeckFile = "resources/starterDecks/starter_warlock.txt"
+DeckFile = "resources/custom/evoWarlock.txt"
 
 [Deckspace]
-HeroClass = "warlock"
-CardSets = ["CORE"]
+HeroClass = "shaman"
+CardSets = ["CORE", "EXPERT1"]
 
 [Search]
 InitialPopulation = 100

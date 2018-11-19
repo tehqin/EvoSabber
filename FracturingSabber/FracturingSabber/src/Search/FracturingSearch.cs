@@ -45,8 +45,8 @@ namespace FracturingSabber.Search
 
          // Configuration for the search space
          _heroClass = CardReader.GetClassFromName(config.Deckspace.HeroClass);
-         _cardSet = CardReader.GetCards(_heroClass);
-         Console.WriteLine("Hero Class: "+_heroClass);
+         CardSet[] sets = CardReader.GetSetsFromNames(config.Deckspace.CardSets);
+         _cardSet = CardReader.GetCards(_heroClass, sets);
       
          InitLogs();
 		}

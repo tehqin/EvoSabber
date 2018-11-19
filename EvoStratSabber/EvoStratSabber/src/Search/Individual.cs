@@ -90,15 +90,16 @@ namespace EvoStratSabber.Search
          {
             int numTypesAvailable = 0;
             for (int i=0; i<cardCounts.Length; i++)
-               if (cardCounts[i] < 2)
+               if (cardCounts[i] < _cardSet[i].MaxAllowedInDeck)
                   numTypesAvailable++;
 
             // Find a random legal card.
             int typeSelected = rnd.Next(numTypesAvailable);
             int cardId = 0;
-            while (cardCounts[cardId] == 2 || typeSelected > 0)
+            while (cardCounts[cardId] == _cardSet[cardId].MaxAllowedInDeck || 
+                   typeSelected > 0)
             {
-               if (cardCounts[cardId] < 2)
+               if (cardCounts[cardId] < _cardSet[cardId].MaxAllowedInDeck)
                   typeSelected--;
                cardId++;
             }
