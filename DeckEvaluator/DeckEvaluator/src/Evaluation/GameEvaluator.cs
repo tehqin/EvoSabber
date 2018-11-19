@@ -171,8 +171,11 @@ namespace DeckEvaluator.Evaluation
                OptionNode bestOption = solutions.OrderByDescending(p => p.Score).First();
                bestOption.PlayerTasks(ref solution);
 
-               if (bestOption.Score != Int32.MaxValue)
+               if (bestOption.Score != Int32.MaxValue &&
+                   bestOption.Score != Int32.MinValue)
+               {
                   totalOptionScore += bestOption.Score;
+               }
 
                //Console.WriteLine($"- Player 1 - <{game.CurrentPlayer.Name}> ---------------------------");
                foreach (PlayerTask task in solution)
