@@ -47,6 +47,7 @@ namespace MapSabber.Search
       public int CardsDrawn { get; set; }
       public int ManaSpent { get; set; }
       public int StrategyAlignment { get; set; }
+      public int Dust { get; set; }
       
       public int Fitness { get; set; }
       public int[] Features { get; set; }

@@ -29,6 +29,7 @@ namespace MapSabber.Logging
                   "Cards Drawn",
                   "Mana Spent",
                   "Strategy Alignment",
+                  "Dust",
                   "Deck",
                };
 
@@ -59,6 +60,7 @@ namespace MapSabber.Logging
 						cur.CardsDrawn.ToString(),
 						cur.ManaSpent.ToString(),
 						cur.StrategyAlignment.ToString(),
+						cur.Dust.ToString(),
 						string.Join("*", deck),
                };
             

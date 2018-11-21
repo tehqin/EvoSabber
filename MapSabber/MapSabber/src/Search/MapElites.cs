@@ -128,6 +128,7 @@ namespace MapSabber.Search
          cur.CardsDrawn = Int32.Parse(textLines[6]);
          cur.ManaSpent = Int32.Parse(textLines[7]);
          cur.StrategyAlignment = Int32.Parse(textLines[8]);
+         cur.Dust = Int32.Parse(textLines[9]);
          
          // Save which elements are relevant to the search
          cur.Features = new []{cur.StrategyAlignment, cur.NumTurns};
@@ -146,6 +147,7 @@ namespace MapSabber.Search
          Console.WriteLine("Cards Drawn: "+cur.CardsDrawn);
          Console.WriteLine("Mana Spent: "+cur.ManaSpent);
          Console.WriteLine("Strategy Alignment: "+cur.StrategyAlignment);
+         Console.WriteLine("Dust: "+cur.Dust);
          Console.WriteLine("------------------");
 
          // Save stats
