@@ -6,7 +6,7 @@ DeckFile = "resources/starterDecks/starter_warlock.txt"
 
 [Deckspace]
 HeroClass = "warlock"
-CardSets = ["CORE"]
+CardSets = ["CORE", "EXPERT1"]
 
 [Search]
 InitialPopulation = 100
