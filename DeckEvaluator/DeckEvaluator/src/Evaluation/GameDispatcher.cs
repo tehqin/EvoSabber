@@ -120,9 +120,29 @@ namespace DeckEvaluator.Evaluation
       {
 			// Queue up the games
          _numActive = _numGames;
-         Parallel.For(0, _numGames, i => {queueGame(i);});
-         //for (int i=0; i<_numGames; i++)
-         //   queueGame(i);
+         //Parallel.For(0, _numGames, i => {queueGame(i);});
+         for (int i=0; i<_numGames; i++)
+            queueGame(i);
+
+         // Calculate turn averages from the totals
+         long avgDamage = _totalDamage * 1000000L / _totalTurns;
+         long avgCardsDrawn = _totalCardsDrawn * 1000000L / _totalTurns;
+         long avgManaSpent = _totalManaSpent * 1000000L / _totalTurns;
+         long avgStrategyAlignment = _totalStrategyAlignment * 100L / _totalTurns;
+
+         // Calculate the dust cost of the deck
+         int dust = 0;
+         foreach (Card c in _playerDeck)
+         {
+            if (c.Rarity == Rarity.COMMON)
+               dust += 40;
+            else if (c.Rarity == Rarity.RARE)
+               dust += 100;
+            else if (c.Rarity == Rarity.EPIC)
+               dust += 400;
+            else if (c.Rarity == Rarity.LEGENDARY)
+               dust += 1600;
+         }
 
          // Output the results to the output file.
 			using (FileStream ow = File.Open(resultsFilename, 
@@ -136,11 +156,12 @@ namespace DeckEvaluator.Evaluation
             WriteText(ow, string.Join("*", usageCounts));
             WriteText(ow, _winCount.ToString());
             WriteText(ow, _totalHealthDifference.ToString());
-            WriteText(ow, _totalDamage.ToString());
+            WriteText(ow, avgDamage.ToString());
             WriteText(ow, _totalTurns.ToString());
-            WriteText(ow, _totalCardsDrawn.ToString());
-            WriteText(ow, _totalManaSpent.ToString());
-            WriteText(ow, _totalStrategyAlignment.ToString());
+            WriteText(ow, avgCardsDrawn.ToString());
+            WriteText(ow, avgManaSpent.ToString());
+            WriteText(ow, avgStrategyAlignment.ToString());
+            WriteText(ow, dust.ToString());
             ow.Close();
          }
       }

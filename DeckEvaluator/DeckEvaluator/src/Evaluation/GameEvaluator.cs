@@ -204,7 +204,7 @@ namespace DeckEvaluator.Evaluation
                }
             }
 
-            totalCardsDrawn = numCardsDrawn;
+            totalCardsDrawn += numCardsDrawn;
 
             // Random mode for Player 2
             //Console.WriteLine($"- Player 2 - <{game.CurrentPlayer.Name}> ---------------------------");
