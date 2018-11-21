@@ -30,6 +30,7 @@ def createImage(rowData, filename):
         data = cellData.split(":")
         cellRow = int(data[0])
         cellCol = int(data[1])
+        winCount = int(data[3])
         fitness = int(data[4])
         cellCol = mapDims[1] - cellCol - 1;        
 
@@ -37,9 +38,7 @@ def createImage(rowData, filename):
 
     # Write the map for the cell fitness
     with sns.axes_style("white"):
-        pal = sns.diverging_palette(220, 20, sep=20, center='dark', as_cmap=True)
-        g = sns.heatmap(fitnessMap, xticklabels=False, yticklabels=False, 
-                        cmap=pal)
+        g = sns.heatmap(fitnessMap, xticklabels=False, yticklabels=False)
         fig = g.get_figure()
         fig.savefig(filename)
     plt.close('all')
