@@ -1,0 +1,14 @@
+[Evaluation]
+NumGames = 200
+
+[Evaluation.Opponent]
+DeckFile = "resources/custom/evoWarlock.txt"
+
+[Deckspace]
+HeroClass = "warlock"
+CardSets = ["CORE", "EXPERT1"]
+
+[Search]
+InitialPopulation = 100
+NumToEvaluate = 10000
+NumElites = 10
