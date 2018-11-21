@@ -168,8 +168,8 @@ namespace FracturingSabber.Search
          
          int numWorkers = 0;
          var shardStable = new Dictionary<int,Shard>();
-         var population = new MapPopulation(_params.MaxPopulation);
-         //var population = new FittestPopulation(_params.MaxPopulation);
+         //var population = new MapPopulation(_params.MaxPopulation);
+         var population = new FittestPopulation(_params.MaxPopulation);
 
          // Generate the initial population.
          for (int curInd=0; curInd<_params.InitialPopulation; curInd++)
