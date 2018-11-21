@@ -61,6 +61,30 @@ namespace MapSabber.Search
          ParentID = -1;
       }
 
+      public int GetStatByName(string name)
+      {
+         if (name.Equals("WinCount"))
+            return WinCount;
+         if (name.Equals("TotalHealthDifference"))
+            return TotalHealthDifference;
+         if (name.Equals("DamageDone"))
+            return DamageDone;
+         if (name.Equals("NumTurns"))
+            return NumTurns;
+         if (name.Equals("CardsDrawn"))
+            return CardsDrawn;
+         if (name.Equals("HandSize"))
+            return HandSize;
+         if (name.Equals("ManaSpent"))
+            return ManaSpent;
+         if (name.Equals("StrategyAlignment"))
+            return StrategyAlignment;
+         if (name.Equals("Dust"))
+            return Dust;
+
+         return Int32.MinValue;
+      }
+
       // Generate a random individual via mutation
       public Individual Mutate()
       {

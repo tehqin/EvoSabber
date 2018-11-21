@@ -36,7 +36,7 @@ namespace MapSabber.Mapping
          _groupSizer = groupSizer;
          _maxIndividualsToEvaluate = config.Search.NumToEvaluate;
          _remapFrequency = config.Map.RemapFrequency;
-         NumFeatures = config.Map.NumFeatures;
+         NumFeatures = config.Map.Features.Length;
       
          _groupBoundaries = new List<int>[NumFeatures];
       }

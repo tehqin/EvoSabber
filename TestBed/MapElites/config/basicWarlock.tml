@@ -13,5 +13,13 @@ InitialPopulation = 100
 NumToEvaluate = 10000
 
 [Map]
+Type = "SlidingFeature"
 RemapFrequency = 100
-NumFeatures = 2   
+StartSize = 2
+EndSize = 20
+
+[[Map.Features]]
+Name = "StrategyAlignment"
+
+[[Map.Features]]
+Name = "NumTurns"

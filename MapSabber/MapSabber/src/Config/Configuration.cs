@@ -21,7 +21,18 @@ namespace MapSabber.Config
 
    class MapParams
    {
+      public string Type { get; set; }
       public int RemapFrequency { get; set; }
-      public int NumFeatures { get; set; }
+      public int StartSize { get; set; }
+      public int EndSize { get; set; }
+
+      public FeatureParams[] Features { get; set; }
+   }
+
+   class FeatureParams
+   {
+      public string Name { get; set; }
+      public int MinValue { get; set; } 
+      public int MaxValue { get; set; } 
    }
 }

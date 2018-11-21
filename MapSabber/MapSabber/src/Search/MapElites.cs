@@ -26,6 +26,7 @@ namespace MapSabber.Search
       private int _individualsEvaluated;
       private int _individualsDispatched;
 
+      string[] featureNames;
       FeatureMap _featureMap;
       Dictionary<int, Individual> _individualStable;
 
@@ -57,6 +58,12 @@ namespace MapSabber.Search
          var config = Toml.ReadFile<Configuration>(_configFilename);
          _params = config.Search;
    
+         Console.WriteLine("NumFeatures: "+config.Map.Features.Length);
+         foreach (var p in config.Map.Features)
+         {
+            Console.WriteLine(p.Name);
+         }
+
          // Configuration for the search space
          _heroClass = CardReader.GetClassFromName(config.Deckspace.HeroClass);
          CardSet[] sets = CardReader.GetSetsFromNames(config.Deckspace.CardSets);
@@ -78,12 +85,21 @@ namespace MapSabber.Search
 
       private void InitMap(Configuration config)
       {
-         var mapSizer = new LinearMapSizer(2, 20);
-         _featureMap = new SlidingFeatureMap(config, mapSizer);
-         _individualStable = new Dictionary<int,Individual>();
-         
-         // Setup the logs to record the data on individuals
+         var mapSizer = new LinearMapSizer(config.Map.StartSize,
+                                           config.Map.EndSize);
+         if (config.Map.Type.Equals("SlidingFeature"))
+            _featureMap = new SlidingFeatureMap(config, mapSizer);
+         else if (config.Map.Type.Equals("FixedFeature"))
+            _featureMap = new FixedFeatureMap(config, mapSizer);
+         else
+            Console.WriteLine("ERROR: No feature map specified in config file.");
+        
+         featureNames = new string[config.Map.Features.Length]; 
+         for (int i=0; i<config.Map.Features.Length; i++)
+            featureNames[i] = config.Map.Features[i].Name;
+
          _map_log = new FrequentMapLog(ELITE_MAP_FILENAME, _featureMap);
+         _individualStable = new Dictionary<int,Individual>();
       }
          
       private static void WriteText(Stream fs, string s)
@@ -132,7 +148,9 @@ namespace MapSabber.Search
          cur.Dust = Int32.Parse(textLines[10]);
          
          // Save which elements are relevant to the search
-         cur.Features = new []{cur.StrategyAlignment, cur.NumTurns};
+         cur.Features = new int[featureNames.Length];
+         for (int i=0; i<featureNames.Length; i++)
+            cur.Features[i] = cur.GetStatByName(featureNames[i]);
          cur.Fitness = cur.TotalHealthDifference;
 
          Console.WriteLine("------------------");
@@ -156,6 +174,7 @@ namespace MapSabber.Search
          bool didHitMaxWins = 
             cur.WinCount > _maxWins;
          bool didHitMaxFitness = 
+
             cur.Fitness > _maxFitness;
          _maxWins = Math.Max(_maxWins, cur.WinCount);
          _maxFitness = 

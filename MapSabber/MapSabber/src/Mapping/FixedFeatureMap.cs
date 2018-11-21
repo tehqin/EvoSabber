@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
+using MapSabber.Config;
 using MapSabber.Mapping.Sizers;
 using MapSabber.Search;
 
@@ -28,19 +29,21 @@ namespace MapSabber.Mapping
       private int[] _lowGroupBound;
       private int[] _highGroupBound;
 
-      public FixedFeatureMap(int numFeatures, int maxIndividualsToEvaluate, 
-            MapSizer groupSizer, int[] lowGroupBound, int[] highGroupBound)
+      public FixedFeatureMap(Configuration config, MapSizer groupSizer)
       {
          _allIndividuals = new List<Individual>();
          _groupSizer = groupSizer;
-         _maxIndividualsToEvaluate = maxIndividualsToEvaluate;
+         _maxIndividualsToEvaluate = config.Search.NumToEvaluate;
          NumGroups = -1;
 
-         NumFeatures = numFeatures;
-         _lowGroupBound = new int[numFeatures];
-         _highGroupBound = new int[numFeatures];
-         Array.Copy(lowGroupBound, _lowGroupBound, numFeatures);
-         Array.Copy(highGroupBound, _highGroupBound, numFeatures);
+         NumFeatures = config.Map.Features.Length;
+         _lowGroupBound = new int[NumFeatures];
+         _highGroupBound = new int[NumFeatures];
+         for (int i=0; i<NumFeatures; i++)
+         {
+            _lowGroupBound[i] = config.Map.Features[i].MinValue;
+            _highGroupBound[i] = config.Map.Features[i].MaxValue;
+         }
       }
 
       private int GetFeatureIndex(int featureId, int feature)
