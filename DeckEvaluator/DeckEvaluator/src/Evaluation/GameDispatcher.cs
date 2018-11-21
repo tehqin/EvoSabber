@@ -135,6 +135,7 @@ namespace DeckEvaluator.Evaluation
          long avgCardsDrawn = _totalCardsDrawn * 1000000L / _totalTurns;
          long avgManaSpent = _totalManaSpent * 1000000L / _totalTurns;
          long avgStrategyAlignment = _totalStrategyAlignment * 100L / _totalTurns;
+         long turnsPerGame = _totalTurns * 1000000L / _numGames;
 
          // Calculate the dust cost of the deck
          int dust = 0;
@@ -163,7 +164,7 @@ namespace DeckEvaluator.Evaluation
             WriteText(ow, _winCount.ToString());
             WriteText(ow, _totalHealthDifference.ToString());
             WriteText(ow, avgDamage.ToString());
-            WriteText(ow, _totalTurns.ToString());
+            WriteText(ow, turnsPerGame.ToString());
             WriteText(ow, avgCardsDrawn.ToString());
             WriteText(ow, avgManaSpent.ToString());
             WriteText(ow, avgStrategyAlignment.ToString());

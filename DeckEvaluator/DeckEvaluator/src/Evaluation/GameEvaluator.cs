@@ -160,7 +160,7 @@ namespace DeckEvaluator.Evaluation
             Console.WriteLine("");
             */
 
-            int numCardsDrawn = 0;
+            int numCardsDrawn = 1;
             while (game.State == State.RUNNING && game.CurrentPlayer == game.Player1)
             {
                //Console.WriteLine("* Calculating solutions *** Player 1 ***");
@@ -180,21 +180,25 @@ namespace DeckEvaluator.Evaluation
                //Console.WriteLine($"- Player 1 - <{game.CurrentPlayer.Name}> ---------------------------");
                foreach (PlayerTask task in solution)
                {
+                  // Need to count this before processing the task
+                  // (in the case of an endturn task.)
+                  numCardsDrawn = Math.Max(numCardsDrawn,
+                        task.Controller.NumCardsDrawnThisTurn);
+                  
                   //Console.WriteLine(task.FullPrint());
                   game.Process(task);
 
                   // Record some stats
                   if (task.PlayerTaskType == PlayerTaskType.PLAY_CARD)
+                  {
                      updateUsage(task.Source.Card);
+                     totalManaSpent += task.Source.Card.Cost;
+                  }
                   if (task.PlayerTaskType == PlayerTaskType.MINION_ATTACK)
                   {
                      int damageTaken = ((ICharacter)task.Source).AttackDamage;
                      totalDamage += damageTaken;
                   }
-                  numCardsDrawn = Math.Max(numCardsDrawn,
-                        task.Controller.NumCardsDrawnThisTurn);
-                  totalManaSpent = Math.Max(totalManaSpent,
-                        task.Controller.TotalManaSpentThisGame);
 
                   if (game.CurrentPlayer.Choice != null)
                   {
@@ -230,10 +234,13 @@ namespace DeckEvaluator.Evaluation
 
          Console.WriteLine($"\nGame: {game.State}, Player1: {game.Player1.PlayState} / Player2: {game.Player2.PlayState}\n");
 
+         // Calculate the number of turns we took.
+         int numTurns = (1+game.Turn) / 2;
+
          bool didWin = game.Player1.PlayState == PlayState.WON;
          return new GameResult(didWin, _cardUsage,
                        game.Player1.Hero.Health-game.Player2.Hero.Health,
-                       totalDamage, game.Turn, totalCardsDrawn, 
+                       totalDamage, numTurns, totalCardsDrawn, 
                        totalManaSpent, totalOptionScore);
       }
    }
