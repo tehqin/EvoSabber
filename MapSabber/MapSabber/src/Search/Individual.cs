@@ -40,11 +40,13 @@ namespace MapSabber.Search
       private List<Card> _cardSet;
     
       public int ID { get; set; }
+      public int ParentID { get; set; }
       public int WinCount { get; set; }
       public int TotalHealthDifference { get; set; }
       public int DamageDone { get; set; }
       public int NumTurns { get; set; }
       public int CardsDrawn { get; set; }
+      public int HandSize { get; set; }
       public int ManaSpent { get; set; }
       public int StrategyAlignment { get; set; }
       public int Dust { get; set; }
@@ -56,6 +58,7 @@ namespace MapSabber.Search
       {
          _cardCounts = cardCounts;
          _cardSet = cardSet;
+         ParentID = -1;
       }
 
       // Generate a random individual via mutation
@@ -111,7 +114,9 @@ namespace MapSabber.Search
             cardsInDeck++;
          }
 
-         return new Individual(cardCounts, _cardSet);
+         var result = new Individual(cardCounts, _cardSet);
+         result.ParentID = ID;
+         return result;
       }
    
       public List<string> GetCards()

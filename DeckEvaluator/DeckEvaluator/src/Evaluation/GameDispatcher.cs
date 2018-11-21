@@ -30,6 +30,7 @@ namespace DeckEvaluator.Evaluation
       private int _totalDamage;
       private int _totalTurns;
       private int _totalCardsDrawn;
+      private int _totalHandSize;
       private int _totalManaSpent;
       private int _totalStrategyAlignment;
 
@@ -53,6 +54,7 @@ namespace DeckEvaluator.Evaluation
          _totalHealthDifference = 0;
          _totalTurns = 0;
          _totalCardsDrawn = 0;
+         _totalHandSize = 0;
          _totalManaSpent = 0;
          _totalStrategyAlignment = 0;
          foreach (Card curCard in playerDeck)
@@ -91,6 +93,7 @@ namespace DeckEvaluator.Evaluation
             _totalDamage += result._damageDone;
             _totalTurns += result._numTurns;
             _totalCardsDrawn += result._cardsDrawn;
+            _totalHandSize += result._handSize;
             _totalManaSpent += result._manaSpent;
             _totalStrategyAlignment += result._strategyAlignment;
             _numActive--;
@@ -133,6 +136,7 @@ namespace DeckEvaluator.Evaluation
          // Calculate turn averages from the totals
          long avgDamage = _totalDamage * 1000000L / _totalTurns;
          long avgCardsDrawn = _totalCardsDrawn * 1000000L / _totalTurns;
+         long avgHandSize = _totalHandSize * 1000000L / _totalTurns;
          long avgManaSpent = _totalManaSpent * 1000000L / _totalTurns;
          long avgStrategyAlignment = _totalStrategyAlignment * 100L / _totalTurns;
          long turnsPerGame = _totalTurns * 1000000L / _numGames;
@@ -166,6 +170,7 @@ namespace DeckEvaluator.Evaluation
             WriteText(ow, avgDamage.ToString());
             WriteText(ow, turnsPerGame.ToString());
             WriteText(ow, avgCardsDrawn.ToString());
+            WriteText(ow, avgHandSize.ToString());
             WriteText(ow, avgManaSpent.ToString());
             WriteText(ow, avgStrategyAlignment.ToString());
             WriteText(ow, dust.ToString());

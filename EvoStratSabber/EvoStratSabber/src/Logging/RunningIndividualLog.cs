@@ -22,6 +22,7 @@ namespace EvoStratSabber.Logging
 				// The data to maintain for individuals evaluated.
 				string[] dataLabels = {
                   "Individual",
+                  "Parent",
                   "Win Count",
                   "Health Difference",
                   "Damage Done",
@@ -30,6 +31,7 @@ namespace EvoStratSabber.Logging
                   "Mana Spent",
                   "Strategy Alignment",
                   "Deck",
+                  "Dust",
                };
 
             WriteText(ow, string.Join(",", dataLabels));
@@ -52,6 +54,7 @@ namespace EvoStratSabber.Logging
 
             string[] data = {
                   cur.ID.ToString(),
+                  cur.ParentID.ToString(),
                   cur.WinCount.ToString(),
 						cur.TotalHealthDifference.ToString(),
 						cur.DamageDone.ToString(),
@@ -59,6 +62,7 @@ namespace EvoStratSabber.Logging
 						cur.CardsDrawn.ToString(),
 						cur.ManaSpent.ToString(),
 						cur.StrategyAlignment.ToString(),
+						cur.Dust.ToString(),
 						string.Join("*", deck),
                };
             

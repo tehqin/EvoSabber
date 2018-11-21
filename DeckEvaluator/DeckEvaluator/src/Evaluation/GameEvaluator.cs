@@ -51,13 +51,14 @@ namespace DeckEvaluator.Evaluation
          public int _damageDone;
          public int _numTurns;
          public int _cardsDrawn;
+         public int _handSize;
          public int _manaSpent;
          public int _strategyAlignment;
 
          public GameResult(bool didWin, Dictionary<string, int> cardUsage,
                            int healthDifference, int damageDone, 
-                           int numTurns, int cardsDrawn, int manaSpent,
-                           int strategyAlignment)
+                           int numTurns, int cardsDrawn, int handSize,
+                           int manaSpent, int strategyAlignment)
          {
             _didWin = didWin;
             _cardUsage = cardUsage;
@@ -65,6 +66,7 @@ namespace DeckEvaluator.Evaluation
             _damageDone = damageDone;
             _numTurns = numTurns;
             _cardsDrawn = cardsDrawn;
+            _handSize = handSize;
             _manaSpent = manaSpent;
             _strategyAlignment = strategyAlignment;
          }
@@ -150,6 +152,7 @@ namespace DeckEvaluator.Evaluation
          int totalCardsDrawn = 0;
          int totalManaSpent = 0;
          int totalOptionScore = 0;
+         int totalHandSize = 0;
 
          while (game.State != State.COMPLETE)
          {
@@ -209,6 +212,7 @@ namespace DeckEvaluator.Evaluation
             }
 
             totalCardsDrawn += numCardsDrawn;
+            totalHandSize += game.Player1.HandZone.Count;
 
             // Random mode for Player 2
             //Console.WriteLine($"- Player 2 - <{game.CurrentPlayer.Name}> ---------------------------");
@@ -241,7 +245,7 @@ namespace DeckEvaluator.Evaluation
          return new GameResult(didWin, _cardUsage,
                        game.Player1.Hero.Health-game.Player2.Hero.Health,
                        totalDamage, numTurns, totalCardsDrawn, 
-                       totalManaSpent, totalOptionScore);
+                       totalHandSize, totalManaSpent, totalOptionScore);
       }
    }
 }

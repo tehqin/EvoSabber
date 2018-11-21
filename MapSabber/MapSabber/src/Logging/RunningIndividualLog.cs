@@ -22,6 +22,7 @@ namespace MapSabber.Logging
 				// The data to maintain for individuals evaluated.
 				string[] dataLabels = {
                   "Individual",
+                  "Parent",
                   "Win Count",
                   "Health Difference",
                   "Damage Done",
@@ -53,6 +54,7 @@ namespace MapSabber.Logging
 
             string[] data = {
                   cur.ID.ToString(),
+                  cur.ParentID.ToString(),
                   cur.WinCount.ToString(),
 						cur.TotalHealthDifference.ToString(),
 						cur.DamageDone.ToString(),

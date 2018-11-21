@@ -40,13 +40,16 @@ namespace EvoStratSabber.Search
       private List<Card> _cardSet;
     
       public int ID { get; set; }
+      public int ParentID { get; set; }
       public int WinCount { get; set; }
       public int TotalHealthDifference { get; set; }
       public int DamageDone { get; set; }
       public int NumTurns { get; set; }
       public int CardsDrawn { get; set; }
+      public int HandSize { get; set; }
       public int ManaSpent { get; set; }
       public int StrategyAlignment { get; set; }
+      public int Dust { get; set; }
       
       public int Fitness { get; set; }
 
@@ -109,7 +112,9 @@ namespace EvoStratSabber.Search
             cardsInDeck++;
          }
 
-         return new Individual(cardCounts, _cardSet);
+         var result = new Individual(cardCounts, _cardSet);
+         result.ParentID = ID;
+         return result;
       }
    
       public List<string> GetCards()
