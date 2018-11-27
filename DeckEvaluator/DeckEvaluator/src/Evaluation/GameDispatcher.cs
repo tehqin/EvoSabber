@@ -109,7 +109,6 @@ namespace DeckEvaluator.Evaluation
          }
 
          Console.WriteLine("Finished game: "+gameId);
-         Thread.Sleep(1000);
       }
 
       private void queueGame(int gameId)
@@ -134,17 +133,14 @@ namespace DeckEvaluator.Evaluation
       {
 			// Queue up the games
          _numActive = _numGames;
-         Parallel.For(0, _numGames, i => {queueGame(i);});
-         /*
+         //Parallel.For(0, _numGames, i => {queueGame(i);});
          for (int i=0; i<_numGames; i++)
          {
             queueGame(i);
             
-            // Rest every 20 games.
-            if ((i+1) % 20 == 0)
-               Thread.Sleep(1000);
+            // Rest every game.
+            Thread.Sleep(1000);
          }
-         */
 
          // Calculate turn averages from the totals
          long avgDamage = _totalDamage * 1000000L / _totalTurns;
