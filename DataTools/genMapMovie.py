@@ -20,12 +20,13 @@ imageDims = (640,480)
 MIN_VALUE = -10 ** 18
 
 def createImage(rowData, filename):
-   
     mapDims = tuple(map(int, rowData[0].split('x')))
     mapData = rowData[1:]
 
     fitnessValues = set()
     fitnessMap = np.full(mapDims[::-1], MIN_VALUE)
+    minVal = 10 ** 18
+    fitnessMask = np.full(mapDims[::-1], True)
     for cellData in mapData:
         data = cellData.split(":")
         cellRow = int(data[0])
@@ -35,16 +36,20 @@ def createImage(rowData, filename):
         cellCol = mapDims[1] - cellCol - 1;        
 
         fitnessMap[cellCol][cellRow] = fitness
+        minVal = min(minVal, fitness)
+        fitnessMask[cellCol][cellRow] = False
 
     # Write the map for the cell fitness
     with sns.axes_style("white"):
-        g = sns.heatmap(fitnessMap, xticklabels=False, yticklabels=False)
+        g = sns.heatmap(fitnessMap, xticklabels=False,
+                        yticklabels=False, mask=fitnessMask,
+                        vmin=minVal)
         fig = g.get_figure()
         fig.savefig(filename)
     plt.close('all')
 
 def createImages(stepSize, rows, filenameTemplate):
-    for endInterval in range(stepSize, len(rows)+1, stepSize):
+    for endInterval in range(stepSize, len(rows), stepSize):
         print('Generating : {}'.format(endInterval))
         filename = filenameTemplate.format(endInterval)
         createImage(rows[endInterval], filename)

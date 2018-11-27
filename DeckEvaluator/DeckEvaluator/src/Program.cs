@@ -9,6 +9,8 @@ using Nett;
 using SabberStoneCore.Enums;
 using SabberStoneCore.Model;
 
+using SabberStoneCoreAi.Score;
+
 using DeckEvaluator.Config;
 using DeckEvaluator.Evaluation;
 
@@ -50,10 +52,14 @@ namespace DeckEvaluator
          string opponentDeckPath = config.Evaluation.Opponent.DeckFile;
          List<Card> opponentDeck = GetDeckFromFile(opponentDeckPath);
          CardClass opponentClass = GetClassFromFile(opponentDeckPath);
+         Score opponentStrategy = GetStrategyFromName(config.Evaluation.Opponent.Strategy);
+         Score playerStrategy = GetStrategyFromName(config.Evaluation.Player.Strategy);
          int numGames = config.Evaluation.NumGames;
          Console.WriteLine("Config File: " + textLines[1]);
          Console.WriteLine("Deck File: " + opponentDeckPath);
          Console.WriteLine("Opponent Hero Class: " + opponentClass);
+         Console.WriteLine("Opponent Strategy: " + opponentStrategy);
+         Console.WriteLine("Player Strategy: " + playerStrategy);
          Console.WriteLine("Num games: "+numGames);
         
          // Setup this worker to use all 8 cores on the node.
@@ -90,7 +96,8 @@ namespace DeckEvaluator
             CardClass playerClass = GetClassFromFile(inboxPath);
 				File.Delete(inboxPath);
             var launcher = new GameDispatcher(numGames, playerClass,
-                  playerDeck, opponentClass, opponentDeck);
+                  playerDeck, playerStrategy, opponentClass, 
+                  opponentDeck, opponentStrategy);
             launcher.Run(outboxPath);
          
             // Cleanup.
@@ -153,5 +160,34 @@ namespace DeckEvaluator
          Console.WriteLine("Card class "+className+" not a valid hero class.");
 			return CardClass.NEUTRAL;
 		}
+
+      private static Score GetStrategyFromName(string name)
+      {
+         if (name == "Aggro")
+         {
+            return new AggroScore();
+         }
+         else if (name == "Control")
+         {
+            return new ControlScore();
+         }
+         else if (name == "Fatigue")
+         {
+            return new FatigueScore();
+         }
+         else if (name == "MidRange")
+         {
+            return new MidRangeScore();
+         }
+         else if (name == "Ramp")
+         {
+            return new RampScore();
+         }
+         else
+         {
+            Console.WriteLine("Strategy "+name+" not a valid strategy.");
+            return null;
+         }
+      }
    }
 }

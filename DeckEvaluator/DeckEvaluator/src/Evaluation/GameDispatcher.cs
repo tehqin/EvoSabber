@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using SabberStoneCore.Enums;
 using SabberStoneCore.Model;
 
+using SabberStoneCoreAi.Score;
+
 using DeckEvaluator.Evaluation;
 
 namespace DeckEvaluator.Evaluation
@@ -19,8 +21,10 @@ namespace DeckEvaluator.Evaluation
       private int _numActive;
       private CardClass _opponentClass;
       private List<Card> _opponentDeck;
+      private Score _opponentStrategy;
       private CardClass _playerClass;
 		private List<Card> _playerDeck;
+      private Score _playerStrategy;
 
       // Total stats for all the games played.
 		private readonly object _statsLock = new object();
@@ -34,17 +38,22 @@ namespace DeckEvaluator.Evaluation
       private int _totalManaSpent;
       private int _totalStrategyAlignment;
 
-		public GameDispatcher(int numGames, CardClass playerClass,
+		public GameDispatcher(int numGames, 
+                            CardClass playerClass,
                             List<Card> playerDeck, 
+                            Score playerStrategy,
                             CardClass opponentClass,
-                            List<Card> opponentDeck)
+                            List<Card> opponentDeck,
+                            Score opponentStrategy)
 		{
          // Save the configuration information.
          _numGames = numGames;
          _playerClass = playerClass;
          _playerDeck = playerDeck;
+         _playerStrategy = playerStrategy;
          _opponentClass = opponentClass;
          _opponentDeck = opponentDeck;
+         _opponentStrategy = opponentStrategy;
          _numActive = numGames;
       
          // Setup the statistics keeping.
@@ -100,6 +109,7 @@ namespace DeckEvaluator.Evaluation
          }
 
          Console.WriteLine("Finished game: "+gameId);
+         Thread.Sleep(1000);
       }
 
       private void queueGame(int gameId)
@@ -108,7 +118,8 @@ namespace DeckEvaluator.Evaluation
          var opponentDeck = new List<Card>(_opponentDeck);
 
       	var ev = new GameEvaluator(_playerClass, playerDeck, 
-               _opponentClass, opponentDeck);
+               _playerStrategy, _opponentClass, opponentDeck,
+               _opponentStrategy);
          runGame(gameId, ev);
       }
 
@@ -123,7 +134,8 @@ namespace DeckEvaluator.Evaluation
       {
 			// Queue up the games
          _numActive = _numGames;
-         //Parallel.For(0, _numGames, i => {queueGame(i);});
+         Parallel.For(0, _numGames, i => {queueGame(i);});
+         /*
          for (int i=0; i<_numGames; i++)
          {
             queueGame(i);
@@ -132,6 +144,7 @@ namespace DeckEvaluator.Evaluation
             if ((i+1) % 20 == 0)
                Thread.Sleep(1000);
          }
+         */
 
          // Calculate turn averages from the totals
          long avgDamage = _totalDamage * 1000000L / _totalTurns;

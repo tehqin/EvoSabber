@@ -3,7 +3,12 @@ NumGames = 200
 
 [Evaluation.Opponent]
 DeckFile = "resources/custom/evoWarlock.txt"
+Strategy = "Aggro"
 
+[Evaluation.Player]
+Strategy = "Aggro"
+
+[Deckspace]
 [Deckspace]
 HeroClass = "warlock"
 CardSets = ["CORE", "EXPERT1"]

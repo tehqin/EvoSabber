@@ -72,19 +72,24 @@ namespace DeckEvaluator.Evaluation
          }
       }
 
-      private CardClass _opponentClass;
-      private List<Card> _opponentDeck;
-      private CardClass _playerClass;
-		private List<Card> _playerDeck;
+      private PlayerSetup _opponent;
+      private PlayerSetup _player;
       private Dictionary<string, int> _cardUsage; 
 
 		public GameEvaluator(CardClass playerClass, List<Card> playerDeck,
-            CardClass opponentClass, List<Card> opponentDeck)
+            Score playerStrategy, CardClass opponentClass, 
+            List<Card> opponentDeck, Score opponentStrategy)
 		{
-         _playerClass = playerClass;
-			_playerDeck = playerDeck;
-         _opponentClass = opponentClass;
-         _opponentDeck = opponentDeck;
+         _player = new PlayerSetup(
+                  playerDeck,
+                  playerClass,
+                  playerStrategy
+               );
+         _opponent = new PlayerSetup(
+                  opponentDeck,
+                  opponentClass,
+                  opponentStrategy
+               );
 
          _cardUsage = new Dictionary<string, int>();
       }
@@ -104,27 +109,16 @@ namespace DeckEvaluator.Evaluation
 
       public GameResult PlayGame()
       {
-         PlayerSetup player1 = new PlayerSetup(
-                  _playerDeck, 
-                  _playerClass, 
-                  new AggroScore()
-               );
-         PlayerSetup player2 = new PlayerSetup(
-                  _opponentDeck,
-                  _playerClass, 
-                  new AggroScore()
-               );
-
          var game = new Game(
             new GameConfig()
                {
                   StartPlayer = 1,
                   Player1Name = "Player1",
-                  Player1HeroClass = player1._hero,
-                  Player1Deck = player1._deck,
+                  Player1HeroClass = _player._hero,
+                  Player1Deck = _player._deck,
                   Player2Name = "Player2",
-                  Player2HeroClass = player2._hero,
-                  Player2Deck = player2._deck,
+                  Player2HeroClass = _opponent._hero,
+                  Player2Deck = _opponent._deck,
                   FillDecks = false,
                   Shuffle = true,
                   SkipMulligan = false
@@ -135,8 +129,8 @@ namespace DeckEvaluator.Evaluation
 
          game.StartGame();
 
-         var aiPlayer1 = player1._strategy;
-         var aiPlayer2 = player2._strategy;
+         var aiPlayer1 = _player._strategy;
+         var aiPlayer2 = _opponent._strategy;
 
          List<int> mulligan1 = aiPlayer1.MulliganRule().Invoke(game.Player1.Choice.Choices.Select(p => game.IdEntityDic[p]).ToList());
          List<int> mulligan2 = aiPlayer2.MulliganRule().Invoke(game.Player2.Choice.Choices.Select(p => game.IdEntityDic[p]).ToList());

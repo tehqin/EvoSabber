@@ -3,6 +3,10 @@ NumGames = 200
 
 [Evaluation.Opponent]
 DeckFile = "resources/starterDecks/starter_warlock.txt"
+Strategy = "Aggro"
+
+[Evaluation.Player]
+Strategy = "Aggro"
 
 [Deckspace]
 HeroClass = "warlock"
