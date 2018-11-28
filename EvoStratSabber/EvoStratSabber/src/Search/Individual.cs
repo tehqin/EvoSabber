@@ -14,10 +14,9 @@ namespace EvoStratSabber.Search
          // construct counts.
          var available = new List<int>();
          for (int i=0; i<cardSet.Count; i++)
-         {
-            available.Add(i);
-            available.Add(i);
-         }
+            for (int cnt=0; cnt<cardSet[i].MaxAllowedInDeck; cnt++)
+               available.Add(i);
+
          for (int i=1; i<available.Count; i++)
 			{
 				int j = (int)(rnd.NextDouble() * i);
@@ -26,7 +25,7 @@ namespace EvoStratSabber.Search
 				available[j] = tmp;
 			}
 
-         int[] cardCounts = new int[cardSet.Count];
+         var cardCounts = new int[cardSet.Count];
          for (int i=0; i<30; i++)
          {
             int cardId = available[i];
