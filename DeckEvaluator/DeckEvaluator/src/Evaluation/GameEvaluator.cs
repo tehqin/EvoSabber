@@ -230,7 +230,7 @@ namespace DeckEvaluator.Evaluation
             }
          }
 
-         Console.WriteLine($"\nGame: {game.State}, Player1: {game.Player1.PlayState} / Player2: {game.Player2.PlayState}\n");
+         //Console.WriteLine($"\nGame: {game.State}, Player1: {game.Player1.PlayState} / Player2: {game.Player2.PlayState}\n");
 
          // Calculate the number of turns we took.
          int numTurns = (1+game.Turn) / 2;

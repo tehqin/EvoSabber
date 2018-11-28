@@ -64,8 +64,8 @@ namespace DeckEvaluator
         
          // Setup this worker to use all 8 cores on the node.
          // If this fails, don't go any further.
-         if (!ConfigureThreadPool(8))
-            return;
+         //if (!ConfigureThreadPool(8))
+         //   return;
 
          // Let the scheduler know we are here.
 			using (FileStream ow = File.Open(activeWorkerPath, 
