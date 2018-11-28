@@ -30,8 +30,8 @@ namespace EvoStratSabber.Logging
                   "Cards Drawn",
                   "Mana Spent",
                   "Strategy Alignment",
-                  "Deck",
                   "Dust",
+                  "Deck",
                };
 
             WriteText(ow, string.Join(",", dataLabels));
