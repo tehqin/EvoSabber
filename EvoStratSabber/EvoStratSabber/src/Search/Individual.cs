@@ -56,6 +56,7 @@ namespace EvoStratSabber.Search
       {
          _cardCounts = cardCounts;
          _cardSet = cardSet;
+         ParentID = -1;
       }
 
       // Generate a random individual via mutation
