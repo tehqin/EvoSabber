@@ -274,7 +274,7 @@ namespace MapSabber.Search
 					{
 						// Wait for the file to finish being written.
 						Console.WriteLine("Worker done: " + workerId);
-						Thread.Sleep(1000);
+						Thread.Sleep(3000);
 
 						ReceiveResults(outboxPath, _individualStable[workerId]);
 						_featureMap.Add(_individualStable[workerId]);
