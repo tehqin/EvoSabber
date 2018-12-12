@@ -27,7 +27,7 @@ namespace MapSabber.Logging
          {
             string[] dataLabels = {
                   "Dimensions",
-                  "Map (f1xf2:Size:ID:Wins:Fitness:Feature1:Feature2)"
+                  "Map (f1xf2:Size:Individual:Wins:Fitness:Feature1:Feature2)"
                };
 
             WriteText(ow, string.Join(",", dataLabels));
