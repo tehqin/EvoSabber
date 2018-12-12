@@ -36,6 +36,7 @@ namespace DeckEvaluator.Evaluation
       private int _totalCardsDrawn;
       private int _totalHandSize;
       private int _totalManaSpent;
+      private int _totalManaWasted;
       private int _totalStrategyAlignment;
 
 		public GameDispatcher(int numGames, 
@@ -65,6 +66,7 @@ namespace DeckEvaluator.Evaluation
          _totalCardsDrawn = 0;
          _totalHandSize = 0;
          _totalManaSpent = 0;
+         _totalManaWasted = 0;
          _totalStrategyAlignment = 0;
          foreach (Card curCard in playerDeck)
          {
@@ -104,6 +106,7 @@ namespace DeckEvaluator.Evaluation
             _totalCardsDrawn += result._cardsDrawn;
             _totalHandSize += result._handSize;
             _totalManaSpent += result._manaSpent;
+            _totalManaWasted += result._manaWasted;
             _totalStrategyAlignment += result._strategyAlignment;
             _numActive--;
          }
@@ -147,6 +150,7 @@ namespace DeckEvaluator.Evaluation
          long avgCardsDrawn = _totalCardsDrawn * 1000000L / _totalTurns;
          long avgHandSize = _totalHandSize * 1000000L / _totalTurns;
          long avgManaSpent = _totalManaSpent * 1000000L / _totalTurns;
+         long avgManaWasted = _totalManaWasted * 1000000L / _totalTurns;
          long avgStrategyAlignment = _totalStrategyAlignment * 100L / _totalTurns;
          long turnsPerGame = _totalTurns * 1000000L / _numGames;
 
@@ -162,6 +166,32 @@ namespace DeckEvaluator.Evaluation
                dust += 400;
             else if (c.Rarity == Rarity.LEGENDARY)
                dust += 1600;
+         }
+
+         // Calculate the sum of mana costs
+         int deckManaSum = 0;
+         foreach (Card c in _playerDeck)
+            deckManaSum += c.Cost;
+         
+         // Calculate the variance of mana costs
+         double avgDeckMana = deckManaSum * 1.0 / _playerDeck.Count;
+         double runningVariance = 0;
+         foreach (Card c in _playerDeck)
+         {
+            double diff = c.Cost - avgDeckMana;
+            runningVariance += diff * diff;
+         }
+         int deckManaVariance = (int)(runningVariance * 1000000 / _playerDeck.Count);
+
+         // Calculate the number of minion and spell cards
+         int numMinionCards = 0;
+         int numSpellCards = 0;
+         foreach (Card c in _playerDeck)
+         {
+            if (c.Type == CardType.MINION) 
+               numMinionCards++;
+            else if (c.Type == CardType.SPELL)
+               numSpellCards++;
          }
 
          // Output the results to the output file.
@@ -181,8 +211,13 @@ namespace DeckEvaluator.Evaluation
             WriteText(ow, avgCardsDrawn.ToString());
             WriteText(ow, avgHandSize.ToString());
             WriteText(ow, avgManaSpent.ToString());
+            WriteText(ow, avgManaWasted.ToString());
             WriteText(ow, avgStrategyAlignment.ToString());
             WriteText(ow, dust.ToString());
+            WriteText(ow, deckManaSum.ToString());
+            WriteText(ow, deckManaVariance.ToString());
+            WriteText(ow, numMinionCards.ToString());
+            WriteText(ow, numSpellCards.ToString());
             ow.Close();
          }
       }

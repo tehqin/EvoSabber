@@ -29,8 +29,13 @@ namespace MapSabber.Logging
                   "Num Turns",
                   "Cards Drawn",
                   "Mana Spent",
+                  "Mana Wasted",
                   "Strategy Alignment",
                   "Dust",
+                  "Deck Mana Sum",
+                  "Deck Mana Variance",
+                  "Num Minion Cards",
+                  "Num Spell Cards",
                   "Deck",
                };
 
@@ -61,8 +66,13 @@ namespace MapSabber.Logging
 						cur.NumTurns.ToString(),
 						cur.CardsDrawn.ToString(),
 						cur.ManaSpent.ToString(),
+						cur.ManaWasted.ToString(),
 						cur.StrategyAlignment.ToString(),
 						cur.Dust.ToString(),
+						cur.DeckManaSum.ToString(),
+						cur.DeckManaVariance.ToString(),
+						cur.NumMinionCards.ToString(),
+						cur.NumSpellCards.ToString(),
 						string.Join("*", deck),
                };
             

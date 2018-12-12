@@ -53,12 +53,14 @@ namespace DeckEvaluator.Evaluation
          public int _cardsDrawn;
          public int _handSize;
          public int _manaSpent;
+         public int _manaWasted;
          public int _strategyAlignment;
 
          public GameResult(bool didWin, Dictionary<string, int> cardUsage,
                            int healthDifference, int damageDone, 
                            int numTurns, int cardsDrawn, int handSize,
-                           int manaSpent, int strategyAlignment)
+                           int manaSpent, int manaWasted,
+                           int strategyAlignment)
          {
             _didWin = didWin;
             _cardUsage = cardUsage;
@@ -68,6 +70,7 @@ namespace DeckEvaluator.Evaluation
             _cardsDrawn = cardsDrawn;
             _handSize = handSize;
             _manaSpent = manaSpent;
+            _manaWasted = manaWasted;
             _strategyAlignment = strategyAlignment;
          }
       }
@@ -145,6 +148,7 @@ namespace DeckEvaluator.Evaluation
          int totalDamage = 0;
          int totalCardsDrawn = 0;
          int totalManaSpent = 0;
+         int totalManaWasted = 0;
          int totalOptionScore = 0;
          int totalHandSize = 0;
 
@@ -162,7 +166,6 @@ namespace DeckEvaluator.Evaluation
             {
                //Console.WriteLine("* Calculating solutions *** Player 1 ***");
                List<OptionNode> solutions = OptionNode.GetSolutions(game, game.Player1.Id, aiPlayer1, maxDepth, maxWidth);
-
 
                var solution = new List<PlayerTask>();
                OptionNode bestOption = solutions.OrderByDescending(p => p.Score).First();
@@ -189,7 +192,6 @@ namespace DeckEvaluator.Evaluation
                   if (task.PlayerTaskType == PlayerTaskType.PLAY_CARD)
                   {
                      updateUsage(task.Source.Card);
-                     totalManaSpent += task.Source.Card.Cost;
                   }
                   if (task.PlayerTaskType == PlayerTaskType.MINION_ATTACK)
                   {
@@ -203,6 +205,9 @@ namespace DeckEvaluator.Evaluation
                      break;
                   }
                }
+               
+               totalManaSpent += game.Player1.UsedMana;
+               totalManaWasted += (game.Player1.BaseMana - game.Player1.UsedMana);
             }
 
             totalCardsDrawn += numCardsDrawn;
@@ -239,7 +244,8 @@ namespace DeckEvaluator.Evaluation
          return new GameResult(didWin, _cardUsage,
                        game.Player1.Hero.Health-game.Player2.Hero.Health,
                        totalDamage, numTurns, totalCardsDrawn, 
-                       totalHandSize, totalManaSpent, totalOptionScore);
+                       totalHandSize, totalManaSpent, totalManaWasted,
+                       totalOptionScore);
       }
    }
 }

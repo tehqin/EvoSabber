@@ -47,8 +47,13 @@ namespace MapSabber.Search
       public int CardsDrawn { get; set; }
       public int HandSize { get; set; }
       public int ManaSpent { get; set; }
+      public int ManaWasted { get; set; }
       public int StrategyAlignment { get; set; }
       public int Dust { get; set; }
+      public int DeckManaSum { get; set; }
+      public int DeckManaVariance { get; set; }
+      public int NumMinionCards { get; set; }
+      public int NumSpellCards { get; set; }
       
       public int Fitness { get; set; }
       public int[] Features { get; set; }
@@ -76,10 +81,20 @@ namespace MapSabber.Search
             return HandSize;
          if (name.Equals("ManaSpent"))
             return ManaSpent;
+         if (name.Equals("ManaWasted"))
+            return ManaWasted;
          if (name.Equals("StrategyAlignment"))
             return StrategyAlignment;
          if (name.Equals("Dust"))
             return Dust;
+         if (name.Equals("DeckManaSum"))
+            return DeckManaSum;
+         if (name.Equals("DeckManaVariance"))
+            return DeckManaVariance;
+         if (name.Equals("NumMinionCards"))
+            return NumMinionCards;
+         if (name.Equals("NumSpellCards"))
+            return NumSpellCards;
 
          return Int32.MinValue;
       }

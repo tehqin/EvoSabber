@@ -27,7 +27,7 @@ namespace MapSabber.Logging
          {
             string[] dataLabels = {
                   "Dimensions",
-                  "Map (f1xf2:Size:Wins:Fitness:Feature1:Feature2)"
+                  "Map (f1xf2:Size:ID:Wins:Fitness:Feature1:Feature2)"
                };
 
             WriteText(ow, string.Join(",", dataLabels));
@@ -60,6 +60,7 @@ namespace MapSabber.Logging
                var cellComponents = new List<string>();
                cellComponents.Add(index);
                cellComponents.Add(_map.CellCount[index].ToString());
+               cellComponents.Add(cur.ID.ToString());
                cellComponents.Add(cur.WinCount.ToString());
                cellComponents.Add(cur.Fitness.ToString());
                cellComponents.Add(cur.Features[0].ToString());

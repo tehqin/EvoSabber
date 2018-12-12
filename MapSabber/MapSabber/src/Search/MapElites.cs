@@ -144,8 +144,13 @@ namespace MapSabber.Search
          cur.CardsDrawn = Int32.Parse(textLines[6]);
          cur.HandSize = Int32.Parse(textLines[7]);
          cur.ManaSpent = Int32.Parse(textLines[8]);
-         cur.StrategyAlignment = Int32.Parse(textLines[9]);
-         cur.Dust = Int32.Parse(textLines[10]);
+         cur.ManaWasted = Int32.Parse(textLines[9]);
+         cur.StrategyAlignment = Int32.Parse(textLines[10]);
+         cur.Dust = Int32.Parse(textLines[11]);
+         cur.DeckManaSum = Int32.Parse(textLines[12]);
+         cur.DeckManaVariance = Int32.Parse(textLines[13]);
+         cur.NumMinionCards = Int32.Parse(textLines[14]);
+         cur.NumSpellCards = Int32.Parse(textLines[15]);
          
          // Save which elements are relevant to the search
          cur.Features = new int[featureNames.Length];
@@ -166,8 +171,13 @@ namespace MapSabber.Search
          Console.WriteLine("Cards Drawn: "+cur.CardsDrawn);
          Console.WriteLine("Hand Size: "+cur.HandSize);
          Console.WriteLine("Mana Spent: "+cur.ManaSpent);
+         Console.WriteLine("Mana Wasted: "+cur.ManaWasted);
          Console.WriteLine("Strategy Alignment: "+cur.StrategyAlignment);
          Console.WriteLine("Dust: "+cur.Dust);
+         Console.WriteLine("Deck Mana Sum: "+cur.DeckManaSum);
+         Console.WriteLine("Deck Mana Variance: "+cur.DeckManaVariance);
+         Console.WriteLine("Num Minion Cards: "+cur.NumMinionCards);
+         Console.WriteLine("Num Spell Cards: "+cur.NumSpellCards);
          Console.WriteLine("------------------");
 
          // Save stats
