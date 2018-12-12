@@ -29,8 +29,13 @@ namespace EvoStratSabber.Logging
                   "Num Turns",
                   "Cards Drawn",
                   "Mana Spent",
+                  "Mana Wasted",
                   "Strategy Alignment",
                   "Dust",
+                  "Deck Mana Sum",
+                  "Deck Mana Variance",
+                  "Num Minion Cards",
+                  "Num Spell Cards",
                   "Deck",
                };
 
@@ -53,17 +58,22 @@ namespace EvoStratSabber.Logging
 				List<string> deck = cur.GetCards();
 
             string[] data = {
-                  cur.ID.ToString(),
+						cur.ID.ToString(),
                   cur.ParentID.ToString(),
                   cur.WinCount.ToString(),
-						cur.TotalHealthDifference.ToString(),
-						cur.DamageDone.ToString(),
-						cur.NumTurns.ToString(),
-						cur.CardsDrawn.ToString(),
-						cur.ManaSpent.ToString(),
-						cur.StrategyAlignment.ToString(),
-						cur.Dust.ToString(),
-						string.Join("*", deck),
+                  cur.TotalHealthDifference.ToString(),
+                  cur.DamageDone.ToString(),
+                  cur.NumTurns.ToString(),
+                  cur.CardsDrawn.ToString(),
+                  cur.ManaSpent.ToString(),
+                  cur.ManaWasted.ToString(),
+                  cur.StrategyAlignment.ToString(),
+                  cur.Dust.ToString(),
+                  cur.DeckManaSum.ToString(),
+                  cur.DeckManaVariance.ToString(),
+                  cur.NumMinionCards.ToString(),
+                  cur.NumSpellCards.ToString(),
+                  string.Join("*", deck),
                };
             
             sw.WriteLine(string.Join(",", data));

@@ -47,8 +47,13 @@ namespace EvoStratSabber.Search
       public int CardsDrawn { get; set; }
       public int HandSize { get; set; }
       public int ManaSpent { get; set; }
+      public int ManaWasted { get; set; }
       public int StrategyAlignment { get; set; }
       public int Dust { get; set; }
+      public int DeckManaSum { get; set; }
+      public int DeckManaVariance { get; set; }
+      public int NumMinionCards { get; set; }
+      public int NumSpellCards { get; set; }
       
       public int Fitness { get; set; }
 
