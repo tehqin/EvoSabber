@@ -14,9 +14,7 @@ feature1_label = 'None'
 feature2_index = 4
 feature2_label = 'None'
 
-
 logFilename = "elite_map_log.csv"
-imageDims = (640,480)
 MIN_VALUE = -10 ** 18
 
 def createImage(rowData, filename):
@@ -57,6 +55,10 @@ def createImages(stepSize, rows, filenameTemplate):
 def createMovie(folderName, filename):
     globStr = os.path.join(folderName, '*.png')
     imageFiles = sorted(glob.glob(globStr))
+
+    # Grab the dimensions of the image
+    img = cv2.imread(imageFiles[0])
+    imageDims = img.shape[:2][::-1]
 
     # Create a video
     fourcc = cv2.VideoWriter_fourcc(*'XVID')

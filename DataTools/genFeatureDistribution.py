@@ -41,7 +41,6 @@ def createMovie(folderName, filename):
     # Grab the dimensions of the image
     img = cv2.imread(imageFiles[0])
     imageDims = img.shape[:2][::-1]
-    print(imageDims)
 
     # Create a video
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
