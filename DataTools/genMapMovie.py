@@ -29,8 +29,10 @@ def createImage(rowData, filename):
         data = cellData.split(":")
         cellRow = int(data[0])
         cellCol = int(data[1])
-        winCount = int(data[3])
-        fitness = int(data[4])
+        cellSize = int(data[2])
+        individualId = int(data[3])
+        winCount = int(data[4])
+        fitness = int(data[5])
         cellCol = mapDims[1] - cellCol - 1;        
 
         fitnessMap[cellCol][cellRow] = fitness
