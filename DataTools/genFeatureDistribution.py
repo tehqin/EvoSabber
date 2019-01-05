@@ -66,5 +66,5 @@ with open(logFilename, "r") as csvfile:
     y = [int(v) for v in rowsTranspose[feature2_index]]
 
     #createImage(x, y, 'feature_dist.png')
-    #createImages(60, x, y, 'images/dist/bi_{:05d}.png', )
+    createImages(60, x, y, 'images/dist/bi_{:05d}.png', )
     createMovie('images/dist', 'dist_video.avi')
