@@ -8,14 +8,13 @@ import csv
 import glob
 import seaborn as sns
 
-feature1_index = 9
+feature1_index = 11
 feature1_label = 'None'
-feature2_index = 7
+feature2_index = 12
 feature2_label = 'None'
 
 
 logFilename = "individual_log.csv"
-imageDims = (648, 609)
 
 def createImage(x, y, filepath):
     with sns.axes_style("white"):
@@ -38,6 +37,11 @@ def createImages(stepSize, x, y, filenameTemplate):
 def createMovie(folderName, filename):
     globStr = os.path.join(folderName, '*.png')
     imageFiles = sorted(glob.glob(globStr))
+
+    # Grab the dimensions of the image
+    img = cv2.imread(imageFiles[0])
+    imageDims = img.shape[:2][::-1]
+    print(imageDims)
 
     # Create a video
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
@@ -63,5 +67,5 @@ with open(logFilename, "r") as csvfile:
     y = [int(v) for v in rowsTranspose[feature2_index]]
 
     #createImage(x, y, 'feature_dist.png')
-    createImages(10, x, y, 'images/dist/bi_{:05d}.png', )
+    #createImages(60, x, y, 'images/dist/bi_{:05d}.png', )
     createMovie('images/dist', 'dist_video.avi')
