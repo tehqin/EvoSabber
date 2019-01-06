@@ -52,8 +52,6 @@ def createImage(rowData, filename):
     rowLabels = [int(sum(rowFrame[i])/len(rowFrame[i])) for i in range(mapDims[0])]
     colFrame = recordFrame.pivot(index='CellRow', columns='CellCol', values='Feature2')
     colLabels = [int(sum(colFrame[i])/len(colFrame[i])) for i in range(mapDims[1])]
-    print(rowLabels)
-    print(colLabels)
 
     # Add the averages of the observed features
     dataLabels += [feature1Label, feature2Label] 
@@ -69,7 +67,6 @@ def createImage(rowData, filename):
     # Write the map for the cell fitness
     fitnessMap = recordFrame.pivot(index=feature2Label, columns=feature1Label, values='WinCount')
     fitnessMap.sort_index(level=1, ascending=False, inplace=True)
-    print(fitnessMap)
     with sns.axes_style("white"):
         g = sns.heatmap(fitnessMap, annot=True, fmt="d")
         fig = g.get_figure()
@@ -108,6 +105,6 @@ with open(logFilename, 'r') as csvfile:
 
     template = 'images/fitness/grid_{:05d}.png'
     createImage(allRows[14], 'fitness_map.png')
-    #createImages(30, allRows[1:], template)
+    createImages(30, allRows[1:], template)
 
-    #createMovie('images/fitness', 'fitness.avi') 
+    createMovie('images/fitness', 'fitness.avi') 
