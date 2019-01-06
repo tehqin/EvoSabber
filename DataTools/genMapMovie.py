@@ -12,7 +12,11 @@ import seaborn as sns
 import pandas as pd
 
 feature1Label = 'Mana Sum'
+feature1Scalar = 1.0
+feature1Precision = 1
 feature2Label = 'Mana Variance'
+feature2Scalar = 1 / 1000000
+feature2Precision = 2
 
 logFilename = "elite_map_log.csv"
 
@@ -49,9 +53,11 @@ def createImage(rowData, filename):
   
     recordFrame = pd.DataFrame(dataDict)
     rowFrame = recordFrame.pivot(index='CellCol', columns='CellRow', values='Feature1')
-    rowLabels = [int(sum(rowFrame[i])/len(rowFrame[i])) for i in range(mapDims[0])]
+    rowLabels = [rowFrame[i].mean(skipna=True) for i in range(mapDims[0])]
     colFrame = recordFrame.pivot(index='CellRow', columns='CellCol', values='Feature2')
-    colLabels = [int(sum(colFrame[i])/len(colFrame[i])) for i in range(mapDims[1])]
+    colLabels = [colFrame[i].mean(skipna=True) for i in range(mapDims[1])]
+    #print(rowLabels)
+    #print(colLabels)
 
     # Add the averages of the observed features
     dataLabels += [feature1Label, feature2Label] 
@@ -59,7 +65,10 @@ def createImage(rowData, filename):
     for recordDatum in recordList:
         cellRow = recordDatum[0]
         cellCol = recordDatum[1]
-        featurePair = [rowLabels[cellRow], colLabels[cellCol]]
+        f1value = round(rowLabels[cellRow] * feature1Scalar, feature1Precision) 
+        f2value = round(colLabels[cellCol] * feature2Scalar, feature2Precision)
+        featurePair = [f1value, f2value]
+        #print(featurePair)
         newRecordList.append(recordDatum+featurePair)
     dataDict = createRecordMap(dataLabels, newRecordList)
     recordFrame = pd.DataFrame(dataDict)
@@ -67,8 +76,12 @@ def createImage(rowData, filename):
     # Write the map for the cell fitness
     fitnessMap = recordFrame.pivot(index=feature2Label, columns=feature1Label, values='WinCount')
     fitnessMap.sort_index(level=1, ascending=False, inplace=True)
+    #print(fitnessMap)
     with sns.axes_style("white"):
-        g = sns.heatmap(fitnessMap, annot=True, fmt="d")
+        plt.figure(figsize=(10,9))
+        g = sns.heatmap(fitnessMap, annot=True, fmt=".0f",
+                vmin=np.nanmin(fitnessMap),
+                vmax=np.nanmax(fitnessMap))
         fig = g.get_figure()
         fig.savefig(filename)
     plt.close('all')
@@ -104,7 +117,7 @@ with open(logFilename, 'r') as csvfile:
     allRows = list(csv.reader(csvfile, delimiter=',', quotechar='|'))
 
     template = 'images/fitness/grid_{:05d}.png'
-    createImage(allRows[14], 'fitness_map.png')
+    createImage(allRows[-1], 'fitness_map.png')
     createImages(30, allRows[1:], template)
 
     createMovie('images/fitness', 'fitness.avi') 
