@@ -8,6 +8,7 @@ import cv2
 import csv
 import glob
 import seaborn as sns
+import pandas as pd
 
 feature1_index = 7
 feature1_label = 'None'
@@ -15,35 +16,63 @@ feature2_index = 4
 feature2_label = 'None'
 
 logFilename = "elite_map_log.csv"
-MIN_VALUE = -10 ** 18
+
+feature1Label = 'Mana Sum'
+feature2Label = 'Mana Variance'
+
+def createRecordList(mapData):
+    recordList = []
+    for cellData in mapData:
+        data = [int(x) for x in cellData.split(":")]
+        recordList.append(data)
+    return recordList 
+
+def createRecordMap(dataLabels, recordList):
+    dataDict = {label:[] for label in dataLabels}
+    for recordDatum in recordList:
+        for i in range(len(dataLabels)):
+            dataDict[dataLabels[i]].append(recordDatum[i])
+    return dataDict
 
 def createImage(rowData, filename):
     mapDims = tuple(map(int, rowData[0].split('x')))
     mapData = rowData[1:]
 
-    fitnessValues = set()
-    fitnessMap = np.full(mapDims[::-1], MIN_VALUE)
-    minVal = 10 ** 18
-    fitnessMask = np.full(mapDims[::-1], True)
-    for cellData in mapData:
-        data = cellData.split(":")
-        cellRow = int(data[0])
-        cellCol = int(data[1])
-        cellSize = int(data[2])
-        individualId = int(data[3])
-        winCount = int(data[4])
-        fitness = int(data[5])
-        cellCol = mapDims[1] - cellCol - 1;        
+    dataLabels = [
+            'CellRow',
+            'CellCol',
+            'CellSize',
+            'IndividualId',
+            'WinCount',
+            'Fitness',
+            'Feature1',
+            'Feature2',
+        ]
+    recordList = createRecordList(mapData)
+    dataDict = createRecordMap(dataLabels, recordList)
+  
+    recordFrame = pd.DataFrame(dataDict)
+    rowFrame = recordFrame.pivot(index='CellCol', columns='CellRow', values='Feature1')
+    rowLabels = [int(sum(rowFrame[i])/len(rowFrame[i])) for i in range(mapDims[0])]
+    colFrame = recordFrame.pivot(index='CellRow', columns='CellCol', values='Feature2')
+    colLabels = [int(sum(colFrame[i])/len(colFrame[i])) for i in range(mapDims[1])]
 
-        fitnessMap[cellCol][cellRow] = fitness
-        minVal = min(minVal, fitness)
-        fitnessMask[cellCol][cellRow] = False
+    # Add the averages of the observed features
+    dataLabels += [feature1Label, feature2Label] 
+    newRecordList = []
+    for recordDatum in recordList:
+        cellRow = recordDatum[0]
+        cellCol = recordDatum[1]
+        featurePair = [rowLabels[cellRow], colLabels[cellCol]]
+        newRecordList.append(recordDatum+featurePair)
+    dataDict = createRecordMap(dataLabels, newRecordList)
+    recordFrame = pd.DataFrame(dataDict)
 
     # Write the map for the cell fitness
+    fitnessMap = recordFrame.pivot(index=feature2Label, columns=feature1Label, values='WinCount')
+    fitnessMap.sort_index(level=1, ascending=False, inplace=True)
     with sns.axes_style("white"):
-        g = sns.heatmap(fitnessMap, xticklabels=False,
-                        yticklabels=False, mask=fitnessMask,
-                        vmin=minVal)
+        g = sns.heatmap(fitnessMap, annot=True, fmt="d")
         fig = g.get_figure()
         fig.savefig(filename)
     plt.close('all')
