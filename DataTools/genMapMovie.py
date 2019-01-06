@@ -11,11 +11,11 @@ import glob
 import seaborn as sns
 import pandas as pd
 
-feature1Label = 'Mana Sum'
-feature1Scalar = 1.0
-feature1Precision = 1
+feature1Label = 'Average Mana'
+feature1Scalar = 1 / 30.0
+feature1Precision = 2
 feature2Label = 'Mana Variance'
-feature2Scalar = 1 / 1000000
+feature2Scalar = 1 / 1000000.0
 feature2Precision = 2
 
 logFilename = "elite_map_log.csv"
@@ -53,11 +53,11 @@ def createImage(rowData, filename):
   
     recordFrame = pd.DataFrame(dataDict)
     rowFrame = recordFrame.pivot(index='CellCol', columns='CellRow', values='Feature1')
-    rowLabels = [rowFrame[i].mean(skipna=True) for i in range(mapDims[0])]
+    rowFrame.dropna(how='all')
+    rowLabels = [rowFrame[i].mean(skipna=True) if i in rowFrame else math.nan for i in range(mapDims[0])]
     colFrame = recordFrame.pivot(index='CellRow', columns='CellCol', values='Feature2')
-    colLabels = [colFrame[i].mean(skipna=True) for i in range(mapDims[1])]
-    #print(rowLabels)
-    #print(colLabels)
+    colFrame.dropna(how='all')
+    colLabels = [colFrame[i].mean(skipna=True) if i in colFrame else math.nan for i in range(mapDims[1])]
 
     # Add the averages of the observed features
     dataLabels += [feature1Label, feature2Label] 
@@ -68,7 +68,6 @@ def createImage(rowData, filename):
         f1value = round(rowLabels[cellRow] * feature1Scalar, feature1Precision) 
         f2value = round(colLabels[cellCol] * feature2Scalar, feature2Precision)
         featurePair = [f1value, f2value]
-        #print(featurePair)
         newRecordList.append(recordDatum+featurePair)
     dataDict = createRecordMap(dataLabels, newRecordList)
     recordFrame = pd.DataFrame(dataDict)
@@ -78,8 +77,12 @@ def createImage(rowData, filename):
     fitnessMap.sort_index(level=1, ascending=False, inplace=True)
     #print(fitnessMap)
     with sns.axes_style("white"):
+        numTicksX = mapDims[0] // 11 + 1
+        numTicksY = mapDims[1] // 11 + 1
         plt.figure(figsize=(10,9))
         g = sns.heatmap(fitnessMap, annot=True, fmt=".0f",
+                xticklabels=numTicksX, 
+                yticklabels=numTicksY,
                 vmin=np.nanmin(fitnessMap),
                 vmax=np.nanmax(fitnessMap))
         fig = g.get_figure()
