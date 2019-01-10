@@ -128,42 +128,5 @@ namespace MapSabber.Mapping
          string index = _eliteIndices[pos];
          return EliteMap[index];
       }
-
-      public void LogMap(string logFilename)
-      {
-         using (var sw = new StreamWriter(logFilename)) 
-         {
-            // The data to maintain for individuals evaluated.
-            string[] dataLabels = {
-                  "Map Key",
-                  "Win Count",
-                  "Health Difference",
-                  "Damage Done",
-                  "Num Turns",
-                  "Cards Drawn",
-                  "Mana Spent",
-                  "Strategy Alignment",
-                  "Deck",
-               };
-
-            sw.WriteLine(string.Join(",", dataLabels));
-            foreach (string index in _eliteIndices)
-            {
-               Individual cur = EliteMap[index];
-					string[] data = {
-							index,
-							cur.WinCount.ToString(),
-							cur.TotalHealthDifference.ToString(),
-							cur.DamageDone.ToString(),
-							cur.NumTurns.ToString(),
-							cur.CardsDrawn.ToString(),
-							cur.ManaSpent.ToString(),
-							cur.StrategyAlignment.ToString(),
-							string.Join("*", cur.GetCards())
-						};
-               sw.WriteLine(string.Join(",", data));
-            }
-         }
-      }
    }
 }

@@ -13,6 +13,7 @@ using MapSabber.Config;
 using MapSabber.Logging;
 using MapSabber.Mapping;
 using MapSabber.Mapping.Sizers;
+using MapSabber.Messaging;
 
 namespace MapSabber.Search
 {
@@ -42,8 +43,6 @@ namespace MapSabber.Search
          LOG_DIRECTORY + "champion_log.csv";
       private const string FITTEST_LOG_FILENAME = 
          LOG_DIRECTORY + "fittest_log.csv";
-      private const string ELITES_FILENAME = 
-         LOG_DIRECTORY + "elites_log.csv";
       private const string ELITE_MAP_FILENAME = 
          LOG_DIRECTORY + "elite_map_log.csv";
       private FrequentMapLog _map_log;
@@ -111,84 +110,66 @@ namespace MapSabber.Search
 
       private void SendWork(string workerInboxPath, Individual cur)
       {
-         List<string> deck = cur.GetCards();
-
-			using (FileStream ow = File.Open(workerInboxPath,
-                   FileMode.Create, FileAccess.Write, FileShare.None))
-         {
-            WriteText(ow, _heroClass.ToString().ToLower());
-            WriteText(ow, string.Join("*", deck));
-            ow.Close();
-         }
+         DeckParams deckMessage = new DeckParams();
+         deckMessage.ClassName = _heroClass.ToString().ToLower();
+         deckMessage.CardList = cur.GetCards();
+         Toml.WriteFile<DeckParams>(deckMessage, workerInboxPath);
       }
 
       private int _maxWins;
       private int _maxFitness;
       private void ReceiveResults(string workerOutboxPath, Individual cur)
       {
-         // Read the file and calculate a true fitness
-         string[] textLines = File.ReadAllLines(workerOutboxPath);
-
-         // Delete the file!
+         // Read the message and then delete the file.
+         var results = Toml.ReadFile<ResultsMessage>(workerOutboxPath);
          File.Delete(workerOutboxPath);
 
-			// Pull out the data from the text of the file.
-         char[] delimeters = {'*'};
-         //string[] cardNames = textLines[0].Split(delimeters);
-         string[] countText = textLines[1].Split(delimeters);
+         // Save the statistics for this individual.
          cur.ID = _individualsEvaluated;
-         cur.WinCount = Int32.Parse(textLines[2]);
-         cur.TotalHealthDifference = Int32.Parse(textLines[3]);
-         cur.DamageDone = Int32.Parse(textLines[4]);
-         cur.NumTurns = Int32.Parse(textLines[5]);
-         cur.CardsDrawn = Int32.Parse(textLines[6]);
-         cur.HandSize = Int32.Parse(textLines[7]);
-         cur.ManaSpent = Int32.Parse(textLines[8]);
-         cur.ManaWasted = Int32.Parse(textLines[9]);
-         cur.StrategyAlignment = Int32.Parse(textLines[10]);
-         cur.Dust = Int32.Parse(textLines[11]);
-         cur.DeckManaSum = Int32.Parse(textLines[12]);
-         cur.DeckManaVariance = Int32.Parse(textLines[13]);
-         cur.NumMinionCards = Int32.Parse(textLines[14]);
-         cur.NumSpellCards = Int32.Parse(textLines[15]);
-         
+         cur.OverallData = results.OverallStats; 
+         cur.StrategyData = results.StrategyStats; 
+
          // Save which elements are relevant to the search
          cur.Features = new int[featureNames.Length];
          for (int i=0; i<featureNames.Length; i++)
             cur.Features[i] = cur.GetStatByName(featureNames[i]);
-         cur.Fitness = cur.TotalHealthDifference;
+         cur.Fitness = cur.OverallData.TotalHealthDifference;
 
+         var os = results.OverallStats;
          Console.WriteLine("------------------");
          Console.WriteLine(string.Format("Eval ({0}): {1}",
                _individualsEvaluated,
                string.Join("", cur.ToString())));
-         Console.WriteLine(String.Join(" ", countText));
-         Console.WriteLine("Win Count: "+cur.WinCount);
+         Console.WriteLine("Win Count: "+os.WinCount);
          Console.WriteLine("Total Health Difference: "
-                           +cur.TotalHealthDifference);
-         Console.WriteLine("Damage Done: "+cur.DamageDone);
-         Console.WriteLine("Num Turns: "+cur.NumTurns);
-         Console.WriteLine("Cards Drawn: "+cur.CardsDrawn);
-         Console.WriteLine("Hand Size: "+cur.HandSize);
-         Console.WriteLine("Mana Spent: "+cur.ManaSpent);
-         Console.WriteLine("Mana Wasted: "+cur.ManaWasted);
-         Console.WriteLine("Strategy Alignment: "+cur.StrategyAlignment);
-         Console.WriteLine("Dust: "+cur.Dust);
-         Console.WriteLine("Deck Mana Sum: "+cur.DeckManaSum);
-         Console.WriteLine("Deck Mana Variance: "+cur.DeckManaVariance);
-         Console.WriteLine("Num Minion Cards: "+cur.NumMinionCards);
-         Console.WriteLine("Num Spell Cards: "+cur.NumSpellCards);
+                           +os.TotalHealthDifference);
+         Console.WriteLine("Damage Done: "+os.DamageDone);
+         Console.WriteLine("Num Turns: "+os.NumTurns);
+         Console.WriteLine("Cards Drawn: "+os.CardsDrawn);
+         Console.WriteLine("Hand Size: "+os.HandSize);
+         Console.WriteLine("Mana Spent: "+os.ManaSpent);
+         Console.WriteLine("Mana Wasted: "+os.ManaWasted);
+         Console.WriteLine("Strategy Alignment: "+os.StrategyAlignment);
+         Console.WriteLine("Dust: "+os.Dust);
+         Console.WriteLine("Deck Mana Sum: "+os.DeckManaSum);
+         Console.WriteLine("Deck Mana Variance: "+os.DeckManaVariance);
+         Console.WriteLine("Num Minion Cards: "+os.NumMinionCards);
+         Console.WriteLine("Num Spell Cards: "+os.NumSpellCards);
          Console.WriteLine("------------------");
+         foreach (var fs in results.StrategyStats)
+         {
+            Console.WriteLine("WinCount: "+fs.WinCount);
+            Console.WriteLine("Alignment: "+fs.Alignment);
+            Console.WriteLine("------------------");
+         }
 
          // Save stats
          bool didHitMaxWins = 
-            cur.WinCount > _maxWins;
+            cur.OverallData.WinCount > _maxWins;
          bool didHitMaxFitness = 
-
             cur.Fitness > _maxFitness;
-         _maxWins = Math.Max(_maxWins, cur.WinCount);
-         _maxFitness = 
-            Math.Max(_maxFitness, cur.Fitness);
+         _maxWins = Math.Max(_maxWins, cur.OverallData.WinCount);
+         _maxFitness = Math.Max(_maxFitness, cur.Fitness);
 
          // Log the individuals
          _individualLog.LogIndividual(cur);
@@ -208,9 +189,9 @@ namespace MapSabber.Search
          
          string boxesDirectory = "boxes/";
          string inboxTemplate = boxesDirectory
-            + "deck-{0,4:D4}-inbox.txt";
+            + "deck-{0,4:D4}-inbox.tml";
          string outboxTemplate = boxesDirectory
-            + "deck-{0,4:D4}-outbox.txt";
+            + "deck-{0,4:D4}-outbox.tml";
 
          // Let the workers know we are here.
          string activeDirectory = "active/";
@@ -218,13 +199,13 @@ namespace MapSabber.Search
             + "worker-{0,4:D4}.txt";
          string activeSearchPath = activeDirectory
             + "search.txt";
-			using (FileStream ow = File.Open(activeSearchPath,
-						FileMode.Create, FileAccess.Write, FileShare.None))
-			{
-				WriteText(ow, "MAP Elites");
-				WriteText(ow, _configFilename);
-				ow.Close();
-			}
+         using (FileStream ow = File.Open(activeSearchPath,
+                  FileMode.Create, FileAccess.Write, FileShare.None))
+         {
+            WriteText(ow, "MAP Elites");
+            WriteText(ow, _configFilename);
+            ow.Close();
+         }
 
          Console.WriteLine("Begin search...");
          while (_individualsEvaluated < _params.NumToEvaluate)
@@ -259,7 +240,7 @@ namespace MapSabber.Search
 
                int workerId = _idleWorkers.Dequeue();
                _runningWorkers.Enqueue(workerId);
-					Console.WriteLine("Starting worker: "+workerId);
+               Console.WriteLine("Starting worker: "+workerId);
                
                Individual choiceIndividual =
                   _individualsDispatched < _params.InitialPopulation ? 
@@ -272,31 +253,31 @@ namespace MapSabber.Search
                _individualsDispatched++;
             }
 
-				// Look for individuals that are done.
-				int numActiveWorkers = _runningWorkers.Count;
-				for (int i=0; i<numActiveWorkers; i++)
-				{
-					int workerId = _runningWorkers.Dequeue();
-					string outboxPath = string.Format(outboxTemplate, workerId);
+            // Look for individuals that are done.
+            int numActiveWorkers = _runningWorkers.Count;
+            for (int i=0; i<numActiveWorkers; i++)
+            {
+               int workerId = _runningWorkers.Dequeue();
+               string outboxPath = string.Format(outboxTemplate, workerId);
 
-					// Test if this worker is done.
-					if (File.Exists(outboxPath))
-					{
-						// Wait for the file to finish being written.
-						Console.WriteLine("Worker done: " + workerId);
-						Thread.Sleep(3000);
+               // Test if this worker is done.
+               if (File.Exists(outboxPath))
+               {
+                  // Wait for the file to finish being written.
+                  Console.WriteLine("Worker done: " + workerId);
+                  Thread.Sleep(3000);
 
-						ReceiveResults(outboxPath, _individualStable[workerId]);
-						_featureMap.Add(_individualStable[workerId]);
-						_idleWorkers.Enqueue(workerId);
-						_individualsEvaluated++;
+                  ReceiveResults(outboxPath, _individualStable[workerId]);
+                  _featureMap.Add(_individualStable[workerId]);
+                  _idleWorkers.Enqueue(workerId);
+                  _individualsEvaluated++;
                   _map_log.UpdateLog();
-					}
-					else
-					{
-						_runningWorkers.Enqueue(workerId);
-					}
-				}
+               }
+               else
+               {
+                  _runningWorkers.Enqueue(workerId);
+               }
+            }
 
 
             Thread.Sleep(5000);
@@ -304,9 +285,6 @@ namespace MapSabber.Search
       
          // Let the workers know that we are done.
          File.Delete(activeSearchPath);
-
-         // Create a log that has all of the elites.
-         _featureMap.LogMap(ELITES_FILENAME); 
       }
    }
 }

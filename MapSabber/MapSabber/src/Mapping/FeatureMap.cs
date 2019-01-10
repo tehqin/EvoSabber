@@ -13,7 +13,5 @@ namespace MapSabber.Mapping
 
       void Add(Individual toAdd);
       Individual GetRandomElite();
-
-      void LogMap(string logFilename);
    }
 }

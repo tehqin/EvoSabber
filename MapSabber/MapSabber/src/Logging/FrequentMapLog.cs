@@ -61,7 +61,7 @@ namespace MapSabber.Logging
                cellComponents.Add(index);
                cellComponents.Add(_map.CellCount[index].ToString());
                cellComponents.Add(cur.ID.ToString());
-               cellComponents.Add(cur.WinCount.ToString());
+               cellComponents.Add(cur.OverallData.WinCount.ToString());
                cellComponents.Add(cur.Fitness.ToString());
                foreach (var curFeature in cur.Features)
                   cellComponents.Add(curFeature.ToString());
