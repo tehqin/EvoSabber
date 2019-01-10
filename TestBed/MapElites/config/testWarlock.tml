@@ -1,16 +1,18 @@
 [Evaluation]
-NumGames = 1
+OpponentDeckSuite = "resources/decks/suites/starterMeta.tml"
+DeckPools = ["resources/decks/pools/starterDecks.tml"]
 
-[Evaluation.Opponent]
-DeckFile = "resources/starterDecks/starter_warlock.txt"
+[[Evaluation.PlayerStrategies]]
+NumGames = 2
 Strategy = "Aggro"
 
-[Evaluation.Player]
-Strategy = "Aggro"
+[[Evaluation.PlayerStrategies]]
+NumGames = 2
+Strategy = "Control"
 
 [Deckspace]
 HeroClass = "warlock"
-CardSets = ["CORE", "EXPERT1"]
+CardSets = ["CORE"]
 
 [Search]
 InitialPopulation = 100

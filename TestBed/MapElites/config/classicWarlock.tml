@@ -1,12 +1,14 @@
 [Evaluation]
-NumGames = 200
+OpponentDeckSuite = "resources/decks/suites/starterMeta.tml"
+DeckPools = ["resources/decks/pools/starterDecks.tml"]
 
-[Evaluation.Opponent]
-DeckFile = "resources/custom/evoWarlock.txt"
+[[Evaluation.PlayerStrategies]]
+NumGames = 100
 Strategy = "Aggro"
 
-[Evaluation.Player]
-Strategy = "Aggro"
+[[Evaluation.PlayerStrategies]]
+NumGames = 100
+Strategy = "Control"
 
 [Deckspace]
 HeroClass = "warlock"
