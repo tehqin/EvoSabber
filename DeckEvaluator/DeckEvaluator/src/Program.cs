@@ -9,10 +9,9 @@ using Nett;
 using SabberStoneCore.Enums;
 using SabberStoneCore.Model;
 
-using SabberStoneCoreAi.Score;
-
 using DeckEvaluator.Config;
 using DeckEvaluator.Evaluation;
+using DeckEvaluator.Messaging;
 
 namespace DeckEvaluator
 {
@@ -31,9 +30,9 @@ namespace DeckEvaluator
          // outbox.
          string boxesDirectory = "boxes/";
          string inboxPath = boxesDirectory + 
-            string.Format("deck-{0,4:D4}-inbox.txt", nodeId);
+            string.Format("deck-{0,4:D4}-inbox.tml", nodeId);
          string outboxPath = boxesDirectory +
-            string.Format("deck-{0,4:D4}-outbox.txt", nodeId);
+            string.Format("deck-{0,4:D4}-outbox.tml", nodeId);
 			
          // Hailing
          string activeDirectory = "active/";
@@ -48,24 +47,17 @@ namespace DeckEvaluator
 
          // The opponent deck doesn't change so we can load it here.
          string[] textLines = File.ReadAllLines(activeSearchPath);
-         var config = Toml.ReadFile<Configuration>(textLines[1]);
-         string opponentDeckPath = config.Evaluation.Opponent.DeckFile;
-         List<Card> opponentDeck = GetDeckFromFile(opponentDeckPath);
-         CardClass opponentClass = GetClassFromFile(opponentDeckPath);
-         Score opponentStrategy = GetStrategyFromName(config.Evaluation.Opponent.Strategy);
-         Score playerStrategy = GetStrategyFromName(config.Evaluation.Player.Strategy);
-         int numGames = config.Evaluation.NumGames;
          Console.WriteLine("Config File: " + textLines[1]);
-         Console.WriteLine("Deck File: " + opponentDeckPath);
-         Console.WriteLine("Opponent Hero Class: " + opponentClass);
-         Console.WriteLine("Opponent Strategy: " + opponentStrategy);
-         Console.WriteLine("Player Strategy: " + playerStrategy);
-         Console.WriteLine("Num games: "+numGames);
-        
-         // Setup this worker to use all 8 cores on the node.
-         // If this fails, don't go any further.
-         //if (!ConfigureThreadPool(8))
-         //   return;
+         var config = Toml.ReadFile<Configuration>(textLines[1]);
+
+         var deckPoolManager = new DeckPoolManager();
+         deckPoolManager.AddDeckPools(config.Evaluation.DeckPools);
+
+
+         var suiteConfig = Toml.ReadFile<DeckSuite>(
+               config.Evaluation.OpponentDeckSuite);
+         var gameSuite = new GameSuite(suiteConfig.Opponents,
+                                       deckPoolManager);
 
          // Let the scheduler know we are here.
 			using (FileStream ow = File.Open(activeWorkerPath, 
@@ -92,19 +84,52 @@ namespace DeckEvaluator
             Thread.Sleep(1000);
 
             // Run games, evaluate the deck, and then save the results.
-            List<Card> playerDeck = GetDeckFromFile(inboxPath);
-            CardClass playerClass = GetClassFromFile(inboxPath);
+            var playerParams = Toml.ReadFile<DeckParams>(inboxPath);
+            Deck playerDeck = playerParams.ContructDeck();
 				File.Delete(inboxPath);
-            var launcher = new GameDispatcher(numGames, playerClass,
-                  playerDeck, playerStrategy, opponentClass, 
-                  opponentDeck, opponentStrategy);
-            launcher.Run(outboxPath);
+
+            int numStrats = config.Evaluation.PlayerStrategies.Length;
+				var stratStats = new StrategyStatistics[numStrats];
+            var overallStats = new OverallStatistics();
+            overallStats.UsageCounts = new int[playerDeck.CardList.Count];
+            RecordDeckProperties(playerDeck, overallStats);
+            for (int i=0; i<numStrats; i++)
+            {
+               // Setup the player with the current strategy
+               PlayerStrategyParams curStrat = 
+                  config.Evaluation.PlayerStrategies[i];
+               var player = new PlayerSetup(playerDeck,
+                  PlayerSetup.GetStrategy(curStrat.Strategy));
+               
+               List<PlayerSetup> opponents =
+                  gameSuite.GetOpponents(curStrat.NumGames);
+
+               var launcher = new GameDispatcher(
+                        player, opponents
+                     );
+               
+               // Run the game and collect statistics
+               OverallStatistics stats = launcher.Run();
+               stratStats[i] = new StrategyStatistics();
+               stratStats[i].WinCount += stats.WinCount;
+               stratStats[i].Alignment += stats.StrategyAlignment;
+               overallStats.Accumulate(stats); 
+            }
+
+            // Write the results
+            overallStats.ScaleByNumStrategies(numStrats);
+            var results = new ResultsMessage();
+            results.PlayerDeck = playerParams;
+            results.OverallStats = overallStats;
+            results.StrategyStats = stratStats;
+            Toml.WriteFile<ResultsMessage>(results, outboxPath);
          
             // Cleanup.
             GC.Collect();
 
             // Look at all the files in the current directory.
             // Eliminate anythings that matches our log file.
+            /*
             string[] oFiles = Directory.GetFiles(".", "DeckEvaluator.o*");
             foreach (string curFile in oFiles)
             {
@@ -113,6 +138,7 @@ namespace DeckEvaluator
                   File.Delete(curFile); 
                }
             }
+            */
          }
       }
 
@@ -121,19 +147,6 @@ namespace DeckEvaluator
          s += "\n";
          byte[] info = new UTF8Encoding(true).GetBytes(s);
          fs.Write(info, 0, info.Length);
-      }
-
-      private static bool ConfigureThreadPool(int maxThreads)
-      {
-         int maxWorker, maxIOC;
-         ThreadPool.GetMaxThreads(out maxWorker, out maxIOC);
-         if (ThreadPool.SetMaxThreads(maxThreads, maxIOC))
-         {
-				return true;
-         }
-         
-         Console.WriteLine("ERROR: Failed to change MaxThreads");
-			return false;
       }
 
       private static List<Card> GetDeckFromFile(string filepath)
@@ -161,33 +174,57 @@ namespace DeckEvaluator
 			return CardClass.NEUTRAL;
 		}
 
-      private static Score GetStrategyFromName(string name)
+      private static void RecordDeckProperties(Deck deck,
+										OverallStatistics stats)
       {
-         if (name == "Aggro")
+         // Calculate the dust cost of the deck
+         int dust = 0;
+         foreach (Card c in deck.CardList)
          {
-            return new AggroScore();
+            if (c.Rarity == Rarity.COMMON)
+               dust += 40;
+            else if (c.Rarity == Rarity.RARE)
+               dust += 100;
+            else if (c.Rarity == Rarity.EPIC)
+               dust += 400;
+            else if (c.Rarity == Rarity.LEGENDARY)
+               dust += 1600;
          }
-         else if (name == "Control")
+
+         // Calculate the sum of mana costs
+         int deckManaSum = 0;
+         foreach (Card c in deck.CardList)
+            deckManaSum += c.Cost;
+
+      	// Calculate the variance of mana costs
+         double avgDeckMana =
+            deckManaSum * 1.0 / deck.CardList.Count;
+         double runningVariance = 0;
+         foreach (Card c in deck.CardList)
          {
-            return new ControlScore();
+            double diff = c.Cost - avgDeckMana;
+            runningVariance += diff * diff;
          }
-         else if (name == "Fatigue")
+         int deckManaVariance =
+            (int)(runningVariance * 1000000 / deck.CardList.Count);
+
+         // Calculate the number of minion and spell cards
+         int numMinionCards = 0;
+         int numSpellCards = 0;
+         foreach (Card c in deck.CardList)
          {
-            return new FatigueScore();
+            if (c.Type == CardType.MINION)
+               numMinionCards++;
+            else if (c.Type == CardType.SPELL)
+               numSpellCards++;
          }
-         else if (name == "MidRange")
-         {
-            return new MidRangeScore();
-         }
-         else if (name == "Ramp")
-         {
-            return new RampScore();
-         }
-         else
-         {
-            Console.WriteLine("Strategy "+name+" not a valid strategy.");
-            return null;
-         }
+
+         // Record the properties
+         stats.Dust = dust;
+         stats.DeckManaSum = deckManaSum;
+         stats.DeckManaVariance = deckManaVariance;
+         stats.NumMinionCards = numMinionCards;
+         stats.NumSpellCards = numSpellCards;
       }
    }
 }

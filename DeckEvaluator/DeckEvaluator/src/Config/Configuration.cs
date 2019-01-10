@@ -7,19 +7,14 @@ namespace DeckEvaluator.Config
 
    class EvaluationParams
    {
+      public string OpponentDeckSuite { get; set; }
+      public string[] DeckPools { get; set; }
+      public PlayerStrategyParams[] PlayerStrategies { get; set; }
+   }
+
+   class PlayerStrategyParams
+   {
       public int NumGames { get; set; }
-      public OpponentParams Opponent { get; set; }
-      public PlayerParams Player { get; set; }
-   }
-
-   class OpponentParams
-   {
-      public string DeckFile { get; set; }
-      public string Strategy { get; set; }
-   }
-
-   class PlayerParams
-   {
       public string Strategy { get; set; }
    }
 }
