@@ -121,6 +121,6 @@ with open(logFilename, 'r') as csvfile:
 
     template = 'images/fitness/grid_{:05d}.png'
     createImage(allRows[-1], 'fitness_map.png')
-    createImages(30, allRows[1:], template)
+    createImages(10, allRows[1:], template)
 
     createMovie('images/fitness', 'fitness.avi') 
