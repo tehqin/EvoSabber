@@ -24,4 +24,4 @@
 module load mono
 #Full path to executable
 
-mono ~/EvoSabber/MapSabber/MapSabber/bin/Release/MapSabber.exe config/classicWarlock.tml
+mono ~/EvoSabber/MapSabber/MapSabber/bin/Release/MapSabber.exe config/classicHunter.tml
