@@ -86,7 +86,6 @@ namespace DeckEvaluator
             // Run games, evaluate the deck, and then save the results.
             var playerParams = Toml.ReadFile<DeckParams>(inboxPath);
             Deck playerDeck = playerParams.ContructDeck();
-				File.Delete(inboxPath);
 
             int numStrats = config.Evaluation.PlayerStrategies.Length;
 				var stratStats = new StrategyStatistics[numStrats];
@@ -123,13 +122,13 @@ namespace DeckEvaluator
             results.OverallStats = overallStats;
             results.StrategyStats = stratStats;
             Toml.WriteFile<ResultsMessage>(results, outboxPath);
+				File.Delete(inboxPath);
          
             // Cleanup.
             GC.Collect();
 
             // Look at all the files in the current directory.
             // Eliminate anythings that matches our log file.
-            /*
             string[] oFiles = Directory.GetFiles(".", "DeckEvaluator.o*");
             foreach (string curFile in oFiles)
             {
@@ -138,7 +137,6 @@ namespace DeckEvaluator
                   File.Delete(curFile); 
                }
             }
-            */
          }
       }
 
@@ -148,31 +146,6 @@ namespace DeckEvaluator
          byte[] info = new UTF8Encoding(true).GetBytes(s);
          fs.Write(info, 0, info.Length);
       }
-
-      private static List<Card> GetDeckFromFile(string filepath)
-      {
-         var currDeck = new List<Card>();
-         string[] textLines = File.ReadAllLines(filepath);
-         char[] delimeters = {'*'};
-         string[] cards = textLines[1].Split(delimeters);
-         for (int i = 0; i < 30; i++)
-         {
-            currDeck.Add(Cards.FromName(cards[i]));
-         }
-         return currDeck;
-      }
-
-		private static CardClass GetClassFromFile(string path)
-		{
-			string[] textLines = File.ReadAllLines(path);
-			string className = textLines[0].Trim().ToUpper();
-         foreach (CardClass curClass in Cards.HeroClasses)
-            if (curClass.ToString().Equals(className))
-               return curClass;
-
-         Console.WriteLine("Card class "+className+" not a valid hero class.");
-			return CardClass.NEUTRAL;
-		}
 
       private static void RecordDeckProperties(Deck deck,
 										OverallStatistics stats)

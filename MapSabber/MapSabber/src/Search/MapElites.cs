@@ -258,14 +258,14 @@ namespace MapSabber.Search
             for (int i=0; i<numActiveWorkers; i++)
             {
                int workerId = _runningWorkers.Dequeue();
+               string inboxPath = string.Format(inboxTemplate, workerId);
                string outboxPath = string.Format(outboxTemplate, workerId);
 
                // Test if this worker is done.
-               if (File.Exists(outboxPath))
+               if (File.Exists(outboxPath) && !File.Exists(inboxPath))
                {
                   // Wait for the file to finish being written.
                   Console.WriteLine("Worker done: " + workerId);
-                  Thread.Sleep(3000);
 
                   ReceiveResults(outboxPath, _individualStable[workerId]);
                   _featureMap.Add(_individualStable[workerId]);
@@ -279,8 +279,7 @@ namespace MapSabber.Search
                }
             }
 
-
-            Thread.Sleep(5000);
+            Thread.Sleep(1000);
          }
       
          // Let the workers know that we are done.
