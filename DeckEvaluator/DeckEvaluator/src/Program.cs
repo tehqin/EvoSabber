@@ -122,6 +122,10 @@ namespace DeckEvaluator
             results.OverallStats = overallStats;
             results.StrategyStats = stratStats;
             Toml.WriteFile<ResultsMessage>(results, outboxPath);
+           
+            // Wait for the TOML file to write (buffers are out of sync)
+            // Then tell the search that we are done writing the file.
+            Thread.Sleep(3000);
 				File.Delete(inboxPath);
          
             // Cleanup.
