@@ -50,10 +50,14 @@ namespace DeckEvaluator
          Console.WriteLine("Config File: " + textLines[1]);
          var config = Toml.ReadFile<Configuration>(textLines[1]);
 
+         // Apply nerfs if nerfs are available
+         ApplyNerfs(config.Nerfs);
+         
+         // Setup the pools of card decks for possible opponents.
          var deckPoolManager = new DeckPoolManager();
          deckPoolManager.AddDeckPools(config.Evaluation.DeckPools);
 
-
+         // Setup test suites: (strategy, deck) combos to play against.
          var suiteConfig = Toml.ReadFile<DeckSuite>(
                config.Evaluation.OpponentDeckSuite);
          var gameSuite = new GameSuite(suiteConfig.Opponents,
@@ -149,6 +153,25 @@ namespace DeckEvaluator
          s += "\n";
          byte[] info = new UTF8Encoding(true).GetBytes(s);
          fs.Write(info, 0, info.Length);
+      }
+
+      private static void ApplyNerfs(NerfParams[] nerfs)
+      {
+         foreach (var curNerf in nerfs)
+            ApplyNerf(curNerf);
+      }
+
+      private static void ApplyNerf(NerfParams nerf)
+      {
+         Card cardToNerf = Cards.FromName(nerf.CardName);
+         cardToNerf.Tags[GameTag.COST] = nerf.NewManaCost;
+         cardToNerf.Tags[GameTag.ATK] = nerf.NewAttack;
+         cardToNerf.Tags[GameTag.HEALTH] = nerf.NewHealth;
+
+         string msg = string.Format("Nerfing ({0}) to ({1}, {2}/{3})",
+               nerf.CardName, nerf.NewManaCost, 
+               nerf.NewAttack, nerf.NewHealth);
+         Console.WriteLine(msg);
       }
 
       private static void RecordDeckProperties(Deck deck,
