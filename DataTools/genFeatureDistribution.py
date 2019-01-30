@@ -8,11 +8,10 @@ import csv
 import glob
 import seaborn as sns
 
-feature1_index = 11
+feature1_index = 12
 feature1_label = 'None'
-feature2_index = 12
+feature2_index = 13
 feature2_label = 'None'
-
 
 logFilename = "individual_log.csv"
 
@@ -65,6 +64,6 @@ with open(logFilename, "r") as csvfile:
     x = [int(v) for v in rowsTranspose[feature1_index]]
     y = [int(v) for v in rowsTranspose[feature2_index]]
 
-    #createImage(x, y, 'feature_dist.png')
-    createImages(60, x, y, 'images/dist/bi_{:05d}.png', )
-    createMovie('images/dist', 'dist_video.avi')
+    createImage(x, y, 'feature_dist.png')
+    #createImages(60, x, y, 'images/dist/bi_{:05d}.png', )
+    #createMovie('images/dist', 'dist_video.avi')

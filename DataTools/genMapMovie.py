@@ -83,8 +83,10 @@ def createImage(rowData, filename):
         g = sns.heatmap(fitnessMap, annot=True, fmt=".0f",
                 xticklabels=numTicksX, 
                 yticklabels=numTicksY,
-                vmin=np.nanmin(fitnessMap),
-                vmax=np.nanmax(fitnessMap))
+                vmin=65,
+                vmax=170)
+                #vmin=np.nanmin(fitnessMap),
+                #vmax=np.nanmax(fitnessMap))
         fig = g.get_figure()
         fig.savefig(filename)
     plt.close('all')
@@ -120,7 +122,6 @@ with open(logFilename, 'r') as csvfile:
     allRows = list(csv.reader(csvfile, delimiter=',', quotechar='|'))
 
     template = 'images/fitness/grid_{:05d}.png'
-    createImage(allRows[-1], 'fitness_map.png')
+    #createImage(allRows[-1], 'fitness_map.png')
     createImages(10, allRows[1:], template)
-
     createMovie('images/fitness', 'fitness.avi') 
