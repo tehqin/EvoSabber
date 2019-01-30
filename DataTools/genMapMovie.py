@@ -19,6 +19,21 @@ feature2Scalar = 1 / 1000000.0
 feature2Precision = 2
 
 logPaths = [
+    # Experiment 1
+    '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Orig/Aggro/Hunter',
+    '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Orig/Aggro/Paladin',
+    '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Orig/Aggro/Warlock',
+    '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Orig/Control/Hunter',
+    '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Orig/Control/Paladin',
+    '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Orig/Control/Warlock',
+
+    # Experiment 2
+    '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Elites/Aggro/Hunter',
+    '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Elites/Aggro/Paladin',
+    '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Elites/Aggro/Warlock',
+    '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Elites/Control/Hunter',
+    '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Elites/Control/Paladin',
+    '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Elites/Control/Warlock',
 
     # Experiment 3
     '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Nerfed/Control/Paladin',
