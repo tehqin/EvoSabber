@@ -18,6 +18,16 @@ feature2Label = 'Mana Variance'
 feature2Scalar = 1 / 1000000.0
 feature2Precision = 2
 
+logPaths = [
+
+    # Experiment 3
+    '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Nerfed/Control/Paladin',
+    '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Nerfed/Control/Warlock',
+    '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Nerfed/Control/Hunter',
+    '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Nerfed/Aggro/Paladin',
+    '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Nerfed/Aggro/Warlock',
+    '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Nerfed/Aggro/Hunter',
+        ]
 logFilename = "elite_map_log.csv"
 
 def createRecordList(mapData):
@@ -97,8 +107,8 @@ def createImages(stepSize, rows, filenameTemplate):
         filename = filenameTemplate.format(endInterval)
         createImage(rows[endInterval], filename)
 
-def createMovie(folderName, filename):
-    globStr = os.path.join(folderName, '*.png')
+def createMovie(folderPath, filename):
+    globStr = os.path.join(folderPath, '*.png')
     imageFiles = sorted(glob.glob(globStr))
 
     # Grab the dimensions of the image
@@ -117,11 +127,28 @@ def createMovie(folderName, filename):
     video.release()
 
 
-import csv
-with open(logFilename, 'r') as csvfile:
-    allRows = list(csv.reader(csvfile, delimiter=',', quotechar='|'))
+def generateAll(folderPath):
+    print('Generating: ', folderPath)
+    logPath = os.path.join(folderPath, logFilename)
+    with open(logPath, 'r') as csvfile:
+        # Read all the data from the csv file
+        allRows = list(csv.reader(csvfile, delimiter=',', quotechar='|'))
+    
+        # First create the final image we need
+        imageFilename = os.path.join(folderPath, 'fitnessMap.png')
+        createImage(allRows[-1], imageFilename)
 
-    template = 'images/fitness/grid_{:05d}.png'
-    #createImage(allRows[-1], 'fitness_map.png')
-    createImages(10, allRows[1:], template)
-    createMovie('images/fitness', 'fitness.avi') 
+        # Clear out the previous images
+        tmpImageFolder = 'images/fitness/'
+        for curFile in glob.glob(tmpImageFolder+'*'):
+            os.remove(curFile)
+
+        template = tmpImageFolder+'grid_{:05d}.png'
+        createImages(10, allRows[1:], template)
+        movieFilename = os.path.join(folderPath, 'fitness.avi')
+        createMovie('images/fitness', movieFilename) 
+
+
+for folderPath in logFolders:
+    generateAll(folderPath)
+
