@@ -164,6 +164,6 @@ def generateAll(folderPath):
         createMovie('images/fitness', movieFilename) 
 
 
-for folderPath in logFolders:
+for folderPath in logPaths:
     generateAll(folderPath)
 
