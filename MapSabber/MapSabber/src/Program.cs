@@ -23,6 +23,31 @@ namespace MapSabber
          var search = new MapElites(configFilename); 
          search.Run();
          
+         // Temporary code for extracting data from the card set
+         /*
+         Console.WriteLine("TEST");
+         var setNames = new string[]{"CORE", "EXPERT1"};
+         CardSet[] cardSets = CardReader.GetSetsFromNames(setNames);
+         
+         var classNames = new string[]{"hunter", "paladin", "warlock"};
+         foreach (var className in classNames)
+         {
+            CardClass heroClass = CardReader.GetClassFromName(className);
+            List<Card> cards = CardReader.GetCards(heroClass, cardSets);
+         
+            Console.WriteLine("Class: "+className);
+            var costStrings = new List<string>();
+            foreach (var curCard in cards)
+               costStrings.Add(curCard.Cost.ToString());
+            Console.WriteLine("Cost: "+string.Join(",", costStrings));
+ 
+            var maxStrings = new List<string>();
+            foreach (var curCard in cards)
+               maxStrings.Add(curCard.MaxAllowedInDeck.ToString());
+            Console.WriteLine("MaxInDeck: "+string.Join(",", maxStrings));
+         }
+         */
+
          /*  Temporary code for filtering cards ****************
          XElement xelement = XElement.Load("resources/CardDefs.xml");
          var filteredCards = new List<XElement>();
