@@ -108,8 +108,8 @@ def createImage(rowData, filename):
         g = sns.heatmap(fitnessMap, annot=True, fmt=".0f",
                 xticklabels=numTicksX, 
                 yticklabels=numTicksY,
-                vmin=65,
-                vmax=170)
+                vmin=0,
+                vmax=200)
                 #vmin=np.nanmin(fitnessMap),
                 #vmax=np.nanmax(fitnessMap))
         fig = g.get_figure()
@@ -159,7 +159,7 @@ def generateAll(folderPath):
             os.remove(curFile)
 
         template = tmpImageFolder+'grid_{:05d}.png'
-        createImages(10, allRows[1:], template)
+        createImages(30, allRows[1:], template)
         movieFilename = os.path.join(folderPath, 'fitness.avi')
         createMovie('images/fitness', movieFilename) 
 
