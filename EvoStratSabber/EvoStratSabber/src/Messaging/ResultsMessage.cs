@@ -1,8 +1,8 @@
 using System;
 
-using MapSabber.Config;
+using EvoStratSabber.Config;
 
-namespace MapSabber.Messaging
+namespace EvoStratSabber.Messaging
 {
    class ResultsMessage
    {

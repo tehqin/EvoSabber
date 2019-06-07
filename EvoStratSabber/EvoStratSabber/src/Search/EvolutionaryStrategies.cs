@@ -12,6 +12,7 @@ using SabberStoneCore.Model;
 
 using EvoStratSabber.Config;
 using EvoStratSabber.Logging;
+using EvoStratSabber.Messaging;
 
 namespace EvoStratSabber.Search
 {
@@ -46,9 +47,9 @@ namespace EvoStratSabber.Search
       // Node communication
       private const string _boxesDirectory = "boxes/";
       private const string _inboxTemplate = _boxesDirectory
-         + "deck-{0,4:D4}-inbox.txt";
+         + "deck-{0,4:D4}-inbox.tml";
       private const string _outboxTemplate = _boxesDirectory
-         + "deck-{0,4:D4}-outbox.txt";
+         + "deck-{0,4:D4}-outbox.tml";
       private const string _activeDirectory = "active/";
       private const string _activeWorkerTemplate = _activeDirectory
          + "worker-{0,4:D4}.txt";
@@ -90,80 +91,61 @@ namespace EvoStratSabber.Search
 
       private void SendWork(string workerInboxPath, Individual cur)
       {
-         List<string> deck = cur.GetCards();
-
-			using (FileStream ow = File.Open(workerInboxPath,
-                   FileMode.Create, FileAccess.Write, FileShare.None))
-         {
-            WriteText(ow, _heroClass.ToString().ToLower());
-            WriteText(ow, string.Join("*", deck));
-            ow.Close();
-         }
+         DeckParams deckMessage = new DeckParams();
+         deckMessage.ClassName = _heroClass.ToString().ToLower();
+         deckMessage.CardList = cur.GetCards();
+         Toml.WriteFile<DeckParams>(deckMessage, workerInboxPath);
       }
 
       private int _maxWins;
       private int _maxFitness;
       private void ReceiveResults(string workerOutboxPath, Individual cur)
       {
-         // Read the file and calculate a true fitness
-         string[] textLines = File.ReadAllLines(workerOutboxPath);
-
-         // Delete the file!
+         // Read the message and then delete the file.
+         var results = Toml.ReadFile<ResultsMessage>(workerOutboxPath);
          File.Delete(workerOutboxPath);
 
-			// Pull out the data from the text of the file.
-         char[] delimeters = {'*'};
-         //string[] cardNames = textLines[0].Split(delimeters);
-         string[] countText = textLines[1].Split(delimeters);
+			// Save the statistics for this individual.
          cur.ID = _individualsEvaluated;
-         cur.WinCount = Int32.Parse(textLines[2]);
-         cur.TotalHealthDifference = Int32.Parse(textLines[3]);
-         cur.DamageDone = Int32.Parse(textLines[4]);
-         cur.NumTurns = Int32.Parse(textLines[5]);
-         cur.CardsDrawn = Int32.Parse(textLines[6]);
-         cur.HandSize = Int32.Parse(textLines[7]);
-         cur.ManaSpent = Int32.Parse(textLines[8]);
-         cur.ManaWasted = Int32.Parse(textLines[9]);
-         cur.StrategyAlignment = Int32.Parse(textLines[10]);
-         cur.Dust = Int32.Parse(textLines[11]);
-         cur.DeckManaSum = Int32.Parse(textLines[12]);
-         cur.DeckManaVariance = Int32.Parse(textLines[13]);
-         cur.NumMinionCards = Int32.Parse(textLines[14]);
-         cur.NumSpellCards = Int32.Parse(textLines[15]);
-         
+         cur.OverallData = results.OverallStats;
+         cur.StrategyData = results.StrategyStats;
+ 
          // Save which elements are relevant to the search
-         cur.Fitness = cur.TotalHealthDifference;
+         cur.Fitness = cur.OverallData.TotalHealthDifference;
 
+         var os = results.OverallStats;
          Console.WriteLine("------------------");
          Console.WriteLine(string.Format("Eval ({0}): {1}",
                _individualsEvaluated,
                string.Join("", cur.ToString())));
-         Console.WriteLine(String.Join(" ", countText));
-         Console.WriteLine("Win Count: "+cur.WinCount);
+         Console.WriteLine("Win Count: "+os.WinCount);
          Console.WriteLine("Total Health Difference: "
-                           +cur.TotalHealthDifference);
-         Console.WriteLine("Damage Done: "+cur.DamageDone);
-         Console.WriteLine("Num Turns: "+cur.NumTurns);
-         Console.WriteLine("Cards Drawn: "+cur.CardsDrawn);
-         Console.WriteLine("Hand Size: "+cur.HandSize);
-         Console.WriteLine("Mana Spent: "+cur.ManaSpent);
-         Console.WriteLine("Mana Wasted: "+cur.ManaWasted);
-         Console.WriteLine("Strategy Alignment: "+cur.StrategyAlignment);
-         Console.WriteLine("Dust: "+cur.Dust);
-         Console.WriteLine("Deck Mana Sum: "+cur.DeckManaSum);
-         Console.WriteLine("Deck Mana Variance: "+cur.DeckManaVariance);
-         Console.WriteLine("Num Minion Cards: "+cur.NumMinionCards);
-         Console.WriteLine("Num Spell Cards: "+cur.NumSpellCards);
+                           +os.TotalHealthDifference);
+         Console.WriteLine("Damage Done: "+os.DamageDone);
+         Console.WriteLine("Num Turns: "+os.NumTurns);
+         Console.WriteLine("Cards Drawn: "+os.CardsDrawn);
+         Console.WriteLine("Hand Size: "+os.HandSize);
+         Console.WriteLine("Mana Spent: "+os.ManaSpent);
+         Console.WriteLine("Mana Wasted: "+os.ManaWasted);
+         Console.WriteLine("Strategy Alignment: "+os.StrategyAlignment);
+         Console.WriteLine("Dust: "+os.Dust);
+         Console.WriteLine("Deck Mana Sum: "+os.DeckManaSum);
+         Console.WriteLine("Deck Mana Variance: "+os.DeckManaVariance);
+         Console.WriteLine("Num Minion Cards: "+os.NumMinionCards);
+         Console.WriteLine("Num Spell Cards: "+os.NumSpellCards);
          Console.WriteLine("------------------");
+         foreach (var fs in results.StrategyStats)
+         {
+            Console.WriteLine("WinCount: "+fs.WinCount);
+            Console.WriteLine("Alignment: "+fs.Alignment);
+            Console.WriteLine("------------------");
+         }
 
          // Save stats
-         bool didHitMaxWins = 
-            cur.WinCount > _maxWins;
-         bool didHitMaxFitness = 
-            cur.Fitness > _maxFitness;
-         _maxWins = Math.Max(_maxWins, cur.WinCount);
-         _maxFitness = 
-            Math.Max(_maxFitness, cur.Fitness);
+         bool didHitMaxWins = cur.OverallData.WinCount > _maxWins;
+         bool didHitMaxFitness = cur.Fitness > _maxFitness;
+         _maxWins = Math.Max(_maxWins, cur.OverallData.WinCount);
+         _maxFitness = Math.Max(_maxFitness, cur.Fitness);
 
          // Log the individuals
          _individualLog.LogIndividual(cur);
@@ -258,14 +240,14 @@ namespace EvoStratSabber.Search
             for (int i=0; i<numActiveWorkers; i++)
             {
                int workerId = _runningWorkers.Dequeue();
+               string inboxPath = string.Format(_inboxTemplate, workerId);
                string outboxPath = string.Format(_outboxTemplate, workerId);
 
                // Test if this worker is done.
-               if (File.Exists(outboxPath))
+               if (File.Exists(outboxPath) && !File.Exists(inboxPath))
                {
                   // Wait for the file to finish being written.
                   Console.WriteLine("Worker done: " + workerId);
-                  Thread.Sleep(3000);
 
                   ReceiveResults(outboxPath, _individualStable[workerId]);
                   population.Add(_individualStable[workerId]);
@@ -284,7 +266,7 @@ namespace EvoStratSabber.Search
                population.Add(curElite);
             }
 
-            Thread.Sleep(5000);
+            Thread.Sleep(1000);
          }
 
          // Let the workers know that we are done.

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 using SabberStoneCore.Model;
 
+using EvoStratSabber.Messaging;
+
 namespace EvoStratSabber.Search
 {
    class Individual
@@ -40,20 +42,9 @@ namespace EvoStratSabber.Search
     
       public int ID { get; set; }
       public int ParentID { get; set; }
-      public int WinCount { get; set; }
-      public int TotalHealthDifference { get; set; }
-      public int DamageDone { get; set; }
-      public int NumTurns { get; set; }
-      public int CardsDrawn { get; set; }
-      public int HandSize { get; set; }
-      public int ManaSpent { get; set; }
-      public int ManaWasted { get; set; }
-      public int StrategyAlignment { get; set; }
-      public int Dust { get; set; }
-      public int DeckManaSum { get; set; }
-      public int DeckManaVariance { get; set; }
-      public int NumMinionCards { get; set; }
-      public int NumSpellCards { get; set; }
+      
+      public OverallStatistics OverallData { get; set; }
+      public StrategyStatistics[] StrategyData { get; set; }
       
       public int Fitness { get; set; }
 
@@ -62,6 +53,11 @@ namespace EvoStratSabber.Search
          _cardCounts = cardCounts;
          _cardSet = cardSet;
          ParentID = -1;
+      }
+
+      public int GetStatByName(string name)
+      {
+         return OverallData.GetStatByName(name);
       }
 
       // Generate a random individual via mutation
@@ -122,12 +118,16 @@ namespace EvoStratSabber.Search
          return result;
       }
    
-      public List<string> GetCards()
+      public string[] GetCards()
       {
-         var cards = new List<string>();
+         var cardList = new List<string>();
          for (int i=0; i<_cardCounts.Length; i++)
             for (int cnt=0; cnt<_cardCounts[i]; cnt++)
-               cards.Add(_cardSet[i].Name);
+               cardList.Add(_cardSet[i].Name);
+
+         var cards = new string[cardList.Count];
+         for (int i=0; i<cardList.Count; i++)
+            cards[i] = cardList[i];
          return cards;
       }
 
