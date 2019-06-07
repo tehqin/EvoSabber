@@ -43,6 +43,11 @@ logPaths = [
     '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Nerfed/Aggro/Warlock',
     '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Nerfed/Aggro/Hunter',
         ]
+
+logPaths = [
+    '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Elites/Control/FixedPaladin',
+    '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Elites/Control/FixedPaladin2/',
+        ]
 logFilename = "elite_map_log.csv"
 
 def createRecordList(mapData):
@@ -158,12 +163,10 @@ def generateAll(folderPath):
         for curFile in glob.glob(tmpImageFolder+'*'):
             os.remove(curFile)
 
-        template = tmpImageFolder+'grid_{:05d}.png'
-        createImages(30, allRows[1:], template)
-        movieFilename = os.path.join(folderPath, 'fitness.avi')
-        createMovie('images/fitness', movieFilename) 
-
+        #template = tmpImageFolder+'grid_{:05d}.png'
+        #createImages(30, allRows[1:], template)
+        #movieFilename = os.path.join(folderPath, 'fitness.avi')
+        #createMovie('images/fitness', movieFilename) 
 
 for folderPath in logPaths:
     generateAll(folderPath)
-

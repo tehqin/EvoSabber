@@ -9,9 +9,11 @@ import glob
 import seaborn as sns
 
 feature1_index = 12
-feature1_label = 'None'
+feature1_label = 'Average Mana'
+feature1_scalar = 1 / 30.0
 feature2_index = 13
-feature2_label = 'None'
+feature2_label = 'Mana Variance'
+feature2_scalar = 1 / 1000000.0
 
 logFilename = "individual_log.csv"
 
@@ -55,14 +57,14 @@ def createMovie(folderName, filename):
 with open(logFilename, "r") as csvfile:
     allRows = list(csv.reader(csvfile, delimiter=',', quotechar='|'))
 
-    feature1_label = allRows[0][feature1_index]
-    feature2_label = allRows[0][feature2_index]
-    print('Feature 1: {}'.format(feature1_label))
-    print('Feature 2: {}'.format(feature2_label))
+    label1 = allRows[0][feature1_index]
+    label2 = allRows[0][feature2_index]
+    print('Feature 1: {}'.format(label1))
+    print('Feature 2: {}'.format(label2))
 
     rowsTranspose = list(zip(*allRows[1:]))
-    x = [int(v) for v in rowsTranspose[feature1_index]]
-    y = [int(v) for v in rowsTranspose[feature2_index]]
+    x = [int(v) * feature1_scalar for v in rowsTranspose[feature1_index]]
+    y = [int(v) * feature2_scalar for v in rowsTranspose[feature2_index]]
 
     createImage(x, y, 'feature_dist.png')
     #createImages(60, x, y, 'images/dist/bi_{:05d}.png', )
