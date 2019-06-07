@@ -3,18 +3,18 @@ OpponentDeckSuite = "resources/decks/suites/starterMeta.tml"
 DeckPools = ["resources/decks/pools/starterDecks.tml"]
 
 [[Evaluation.PlayerStrategies]]
-NumGames = 2
+NumGames = 200
 Strategy = "Aggro"
 
-[[Evaluation.PlayerStrategies]]
-NumGames = 2
-Strategy = "Control"
-
 [Deckspace]
-HeroClass = "warlock"
+HeroClass = "paladin"
 CardSets = ["CORE"]
 
 [Search]
 InitialPopulation = 100
 NumToEvaluate = 10000
 NumElites = 10
+
+[[Nerfs]]
+CardName = "Equality"
+NewManaCost = 4
