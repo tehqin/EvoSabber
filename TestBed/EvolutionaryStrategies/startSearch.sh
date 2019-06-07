@@ -24,4 +24,4 @@
 module load mono
 #Full path to executable
 
-mono ~/EvoSabber/EvoStratSabber/EvoStratSabber/bin/Release/EvoStratSabber.exe config/basicWarlock.tml
+mono ~/EvoSabber/EvoStratSabber/EvoStratSabber/bin/Release/EvoStratSabber.exe config/classicPaladin.tml
