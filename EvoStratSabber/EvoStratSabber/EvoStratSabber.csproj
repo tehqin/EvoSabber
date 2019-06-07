@@ -42,9 +42,11 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\Program.cs" />
-    <Compile Include="src\Config\Configuration.cs" />
     <Compile Include="src\Config\CardReader.cs" />
+    <Compile Include="src\Config\Configuration.cs" />
+    <Compile Include="src\Config\Deck.cs" />
     <Compile Include="src\Logging\RunningIndividualLog.cs" />
+    <Compile Include="src\Messaging\ResultsMessage.cs" />
     <Compile Include="src\Search\EvolutionaryStrategies.cs" />
     <Compile Include="src\Search\Individual.cs" />
   </ItemGroup>
