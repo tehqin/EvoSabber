@@ -157,6 +157,9 @@ namespace DeckEvaluator
 
       private static void ApplyNerfs(NerfParams[] nerfs)
       {
+         if (nerfs == null)
+            return;
+
          foreach (var curNerf in nerfs)
             ApplyNerf(curNerf);
       }
