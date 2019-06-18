@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProjectGuid>{577726A4-9BB4-483A-8345-05D5C1F8634B}</ProjectGuid>
     <OutputType>Exe</OutputType>
@@ -46,6 +46,7 @@
     <Compile Include="src\Config\Configuration.cs" />
     <Compile Include="src\Config\Deck.cs" />
     <Compile Include="src\Logging\RunningIndividualLog.cs" />
+    <Compile Include="src\Messaging\PlayMatchesMessage.cs" />
     <Compile Include="src\Messaging\ResultsMessage.cs" />
     <Compile Include="src\Search\EvolutionaryStrategies.cs" />
     <Compile Include="src\Search\Individual.cs" />
