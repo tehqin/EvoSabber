@@ -41,7 +41,7 @@ namespace DeckEvaluator.Evaluation
             Deck deck = _deckPools.GetDeck(curType.DeckPool, 
                   curType.DeckName);
             var opponent = new PlayerSetup(deck, 
-                  PlayerSetup.GetStrategy(curType.Strategy));
+                  PlayerSetup.GetStrategy(curType.Strategy, null));
             opponents.Add(opponent);
             numTakenOfType++;
          }

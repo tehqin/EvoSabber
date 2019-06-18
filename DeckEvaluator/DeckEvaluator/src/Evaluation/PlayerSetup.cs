@@ -3,6 +3,7 @@ using System;
 using SabberStoneCoreAi.Score;
 
 using DeckEvaluator.Config;
+using DeckEvaluator.Messaging;
 
 namespace DeckEvaluator.Evaluation
 {
@@ -18,7 +19,7 @@ namespace DeckEvaluator.Evaluation
          Strategy = strategy;
       }
 
-      public static Score GetStrategy(string name)
+      public static Score GetStrategy(string name, CustomStratWeights weights)
       {
          if (name.Equals("Aggro"))
             return new AggroScore();
@@ -30,6 +31,8 @@ namespace DeckEvaluator.Evaluation
             return new MidRangeScore();
          if (name.Equals("Ramp"))
             return new RampScore();
+         if (name.Equals("Custom"))
+            return new CustomScore(weights);
 
          Console.WriteLine("Strategy "+name+" not a valid strategy.");
          return null;

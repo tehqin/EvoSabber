@@ -88,8 +88,8 @@ namespace DeckEvaluator
             Thread.Sleep(1000);
 
             // Run games, evaluate the deck, and then save the results.
-            var playerParams = Toml.ReadFile<DeckParams>(inboxPath);
-            Deck playerDeck = playerParams.ContructDeck();
+            var playMessage = Toml.ReadFile<PlayMatchesMessage>(inboxPath);
+            Deck playerDeck = playMessage.Deck.ContructDeck();
 
             int numStrats = config.Evaluation.PlayerStrategies.Length;
 				var stratStats = new StrategyStatistics[numStrats];
@@ -102,7 +102,7 @@ namespace DeckEvaluator
                PlayerStrategyParams curStrat = 
                   config.Evaluation.PlayerStrategies[i];
                var player = new PlayerSetup(playerDeck,
-                  PlayerSetup.GetStrategy(curStrat.Strategy));
+                  PlayerSetup.GetStrategy(curStrat.Strategy, playMessage.Strategy));
                
                List<PlayerSetup> opponents =
                   gameSuite.GetOpponents(curStrat.NumGames);
@@ -122,7 +122,7 @@ namespace DeckEvaluator
             // Write the results
             overallStats.ScaleByNumStrategies(numStrats);
             var results = new ResultsMessage();
-            results.PlayerDeck = playerParams;
+            results.PlayerDeck = playMessage.Deck;
             results.OverallStats = overallStats;
             results.StrategyStats = stratStats;
             Toml.WriteFile<ResultsMessage>(results, outboxPath);

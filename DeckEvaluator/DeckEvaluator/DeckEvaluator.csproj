@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProjectGuid>{194526A7-36F5-4F18-8764-585A058432BD}</ProjectGuid>
     <OutputType>Exe</OutputType>
@@ -51,6 +51,8 @@
     <Compile Include="src\Evaluation\GameDispatcher.cs" />
     <Compile Include="src\Evaluation\GameEvaluator.cs" />
     <Compile Include="src\Evaluation\GameSuite.cs" />
+    <Compile Include="src\Messaging\CustomStratWeights.cs" />
+    <Compile Include="src\Messaging\PlayMatchesMessage.cs" />
     <Compile Include="src\Messaging\ResultsMessage.cs" />
     <Compile Include="src\Meta\DeckTypes.cs" />
     <Compile Include="src\Meta\Decks.cs" />
@@ -58,6 +60,7 @@
     <Compile Include="src\Nodes\OptionNode.cs" />
     <Compile Include="src\Score\AggroScore.cs" />
     <Compile Include="src\Score\Control.cs" />
+    <Compile Include="src\Score\CustomScore.cs" />
     <Compile Include="src\Score\Fatigue.cs" />
     <Compile Include="src\Score\MidRangeScore.cs" />
     <Compile Include="src\Score\Ramp.cs" />
