@@ -44,6 +44,7 @@ namespace StratSearchSabber.Search
          for (int i=0; i<NUM_PARAMS; i++)
             child._paramVector[i] = _clip(_gaussian(scalar) + _paramVector[i]);
          
+         child.ParentID = ID;
          return child;
       }
 
