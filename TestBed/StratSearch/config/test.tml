@@ -1,0 +1,17 @@
+[Evaluation]
+OpponentDeckSuite = "resources/decks/suites/starterMeta.tml"
+DeckPools = ["resources/decks/pools/starterDecks.tml"]
+
+[[Evaluation.PlayerStrategies]]
+NumGames = 6
+Strategy = "Custom"
+
+[Search]
+InitialPopulation = 1
+NumToEvaluate = 100
+NumElites = 1
+MutationScalar = 0.05
+
+[Player]
+DeckPool = "Starter Decks"
+DeckName = "Hunter"
