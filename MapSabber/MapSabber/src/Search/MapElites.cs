@@ -110,10 +110,14 @@ namespace MapSabber.Search
 
       private void SendWork(string workerInboxPath, Individual cur)
       {
-         DeckParams deckMessage = new DeckParams();
-         deckMessage.ClassName = _heroClass.ToString().ToLower();
-         deckMessage.CardList = cur.GetCards();
-         Toml.WriteFile<DeckParams>(deckMessage, workerInboxPath);
+         var deckParams = new DeckParams();
+         deckParams.ClassName = _heroClass.ToString().ToLower();
+         deckParams.CardList = cur.GetCards();
+
+         var msg = new PlayMatchesMessage();
+         msg.Deck = deckParams;
+
+         Toml.WriteFile<PlayMatchesMessage>(msg, workerInboxPath);
       }
 
       private int _maxWins;

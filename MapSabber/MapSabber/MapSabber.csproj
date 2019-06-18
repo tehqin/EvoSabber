@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProjectGuid>{561EF8E1-9DB8-4121-A9D9-6E470B8799EE}</ProjectGuid>
     <OutputType>Exe</OutputType>
@@ -52,6 +52,7 @@
     <Compile Include="src\Mapping\SlidingFeatureMap.cs" />
     <Compile Include="src\Mapping\Sizers\MapSizer.cs" />
     <Compile Include="src\Mapping\Sizers\LinearMapSizer.cs" />
+    <Compile Include="src\Messaging\PlayMatchesMessage.cs" />
     <Compile Include="src\Messaging\ResultsMessage.cs" />
     <Compile Include="src\Search\MapElites.cs" />
     <Compile Include="src\Search\Individual.cs" />
