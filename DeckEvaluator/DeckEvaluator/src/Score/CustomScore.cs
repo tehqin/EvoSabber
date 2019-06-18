@@ -27,7 +27,22 @@ namespace SabberStoneCoreAi.Score
 
          double result = 0;
 			
+         result += Weights.HeroHp * HeroHp;
          result += Weights.OpHeroHp * OpHeroHp;
+         result += Weights.HeroAtk * HeroAtk;
+         result += Weights.OpHeroAtk * OpHeroAtk;
+         result += Weights.HandTotCost * HandTotCost;
+         result += Weights.HandCnt * HandCnt;
+         result += Weights.OpHandCnt * OpHandCnt;
+         result += Weights.DeckCnt * DeckCnt;
+         result += Weights.OpDeckCnt * OpDeckCnt;
+
+         result += Weights.MinionTotAtk * MinionTotAtk;
+         result += Weights.OpMinionTotAtk * OpMinionTotAtk;
+         result += Weights.MinionTotHealth * MinionTotHealth;
+         result += Weights.OpMinionTotHealth * OpMinionTotHealth;
+         result += Weights.MinionTotHealthTaunt * MinionTotHealthTaunt;
+         result += Weights.OpMinionTotHealthTaunt * OpMinionTotHealthTaunt;
          
          result *= 1000;
          return (int)result;
