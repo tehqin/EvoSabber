@@ -24,4 +24,4 @@
 module load mono
 #Full path to executable
 
-mono ~/EvoSabber/MapSabber/MapSabber/bin/Release/MapSabber.exe config/fixedPaladin.tml
+mono ~/EvoSabber/StratSearchSabber/StratSearchSabber/bin/Release/StratSearchSabber.exe config/classicHunter.tml
