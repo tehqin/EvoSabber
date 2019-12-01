@@ -1,6 +1,6 @@
 # EvoSabber
 
-This project is the experimental environment for the paper [Mapping Hearthstone Deck Spaces through MAP-Elites with Sliding Boundaries](https://arxiv.org/abs/1904.10656).
+This project is the experimental environment for the paper *[Mapping Hearthstone Deck Spaces through MAP-Elites with Sliding Boundaries](https://arxiv.org/abs/1904.10656)*.
 
 The goal of the project is to automatically generate decks for the digital card game Hearthstone. The project is frozen in time to allow for easy replication of the experiments from the paper. However, the experiments are configurable through TOML files and it is fairly easy to modify to use new card sets or search different gameplay properties.
 
