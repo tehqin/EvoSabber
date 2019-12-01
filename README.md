@@ -4,7 +4,7 @@ This project is the experimental environment for the paper [Mapping Hearthstone 
 
 The goal of the project is to automatically generate decks for the digital card game Hearthstone. The project is frozen in time to allow for easy replication of the experiments from the paper. However, the experiments are configurable through TOML files and it is fairly easy to modify to use new card sets or search different gameplay properties.
 
-The project was designed to run through mono on a Linux-based system. This was mostly done because our HPC only had mono installed and it wasn't possible to install dotnet quickly enough for our experiments. SabberStone has moved to be entirely dotnet. To make this legacy system possible, we've included the SabberStone dll compiled for mono. Therefore, it should be easy to install and run this project purely from mono. Under development is a dotnet based project that will be released soon and compatible for with the new SabberStone
+The project was designed to run through mono on a Linux-based system. This was mostly done because our HPC only had mono installed and it wasn't possible to install dotnet quickly enough for our experiments. SabberStone has moved to be entirely dotnet. To make this legacy system possible, we've included the SabberStone dll compiled for mono. Therefore, it should be easy to install and run this project purely from mono. Under development is a dotnet based project that will be released soon and compatible with the new SabberStone
 
 ## Installation
 
