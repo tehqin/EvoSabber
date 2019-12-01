@@ -1,17 +1,13 @@
 [Evaluation]
-OpponentDeckSuite = "resources/decks/suites/starterMeta.tml"
-DeckPools = ["resources/decks/pools/starterDecks.tml"]
+OpponentDeckSuite = "resources/decks/suites/eliteMeta.tml"
+DeckPools = ["resources/decks/pools/eliteDecks.tml"]
 
 [[Evaluation.PlayerStrategies]]
-NumGames = 100
-Strategy = "Aggro"
-
-[[Evaluation.PlayerStrategies]]
-NumGames = 100
+NumGames = 200
 Strategy = "Control"
 
 [Deckspace]
-HeroClass = "warlock"
+HeroClass = "paladin"
 CardSets = ["CORE", "EXPERT1"]
 
 [Search]
@@ -19,13 +15,17 @@ InitialPopulation = 100
 NumToEvaluate = 10000
 
 [Map]
-Type = "SlidingFeature"
+Type = "FixedFeature"
 RemapFrequency = 100
 StartSize = 2
 EndSize = 20
 
 [[Map.Features]]
 Name = "DeckManaSum"
+MinValue = 30
+MaxValue = 165
 
 [[Map.Features]]
 Name = "DeckManaVariance"
+MinValue = 2000000
+MaxValue = 5500000

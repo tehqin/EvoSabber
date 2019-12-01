@@ -1,0 +1,67 @@
+[Evaluation]
+OpponentDeckSuite = "resources/decks/suites/eliteMeta.tml"
+DeckPools = ["resources/decks/pools/eliteDecks.tml"]
+
+[[Evaluation.PlayerStrategies]]
+NumGames = 200
+Strategy = "Control"
+
+[Deckspace]
+HeroClass = "paladin"
+CardSets = ["CORE", "EXPERT1"]
+
+[Search]
+InitialPopulation = 100
+NumToEvaluate = 10000
+
+[Map]
+Type = "SlidingFeature"
+RemapFrequency = 100
+StartSize = 2
+EndSize = 20
+
+[[Map.Features]]
+Name = "DeckManaSum"
+
+[[Map.Features]]
+Name = "DeckManaVariance"
+
+[[Nerfs]]
+CardName = "Earthen Ring Farseer"
+NewManaCost = 5
+NewAttack = 3
+NewHealth = 3
+
+[[Nerfs]]
+CardName = "Explosive Shot"
+NewManaCost = 7
+
+[[Nerfs]]
+CardName = "Argent Squire"
+NewManaCost = 1
+NewAttack = 1
+NewHealth = 1
+
+[[Nerfs]]
+CardName = "Young Priestess"
+NewManaCost = 3
+NewAttack = 2
+NewHealth = 1
+
+[[Nerfs]]
+CardName = "Sunwalker"
+NewManaCost = 6
+NewAttack = 1
+NewHealth = 5
+
+[[Nerfs]]
+CardName = "Master Swordsmith"
+NewManaCost = 2
+NewAttack = 1
+NewHealth = 1
+
+[[Nerfs]]
+CardName = "Silverback Patriarch"
+NewManaCost = 3
+NewAttack = 3
+NewHealth = 4

@@ -1,6 +1,6 @@
 [Evaluation]
-OpponentDeckSuite = "resources/decks/suites/starterMeta.tml"
-DeckPools = ["resources/decks/pools/starterDecks.tml"]
+OpponentDeckSuite = "resources/decks/suites/eliteMeta.tml"
+DeckPools = ["resources/decks/pools/eliteDecks.tml"]
 
 [[Evaluation.PlayerStrategies]]
 NumGames = 100
@@ -11,7 +11,7 @@ NumGames = 100
 Strategy = "Control"
 
 [Deckspace]
-HeroClass = "hunter"
+HeroClass = "paladin"
 CardSets = ["CORE", "EXPERT1"]
 
 [Search]
