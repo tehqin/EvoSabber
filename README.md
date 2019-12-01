@@ -45,3 +45,38 @@ mono ../../DeckEvaluator/DeckEvaluator/bin/Release/DeckEvaluator.exe 1
 ```
 
 This starts a deck evalutation node. The first number is the ID of the node being run. Each deck evaluation node needs a separate ID and must be started after the search node boots.
+
+The experiments were designed to be run with 499 `DeckEvaluator` nodes and 1 `MapSabber` node. Included in TestBed are two shell scripts for starting nodes using GridEngine.
+
+## Config Files
+Each configuration file allows for configuration of which card sets are allowed, the number of games to play using a specified strategy, the opponent decks and strategies, and configuration information for MAP-Elites. Below is an example config file for running 200 games per deck against a suite of starter decks. The search is exploring control decks for the Hunter class and diversifying over the Mana curve of each deck.
+
+```
+[Evaluation]
+OpponentDeckSuite = "resources/decks/suites/starterMeta.tml"
+DeckPools = ["resources/decks/pools/starterDecks.tml"]
+
+[[Evaluation.PlayerStrategies]]
+NumGames = 200
+Strategy = "Control"
+
+[Deckspace]
+HeroClass = "hunter"
+CardSets = ["CORE", "EXPERT1"]
+
+[Search]
+InitialPopulation = 100
+NumToEvaluate = 10000
+
+[Map]
+Type = "SlidingFeature"
+RemapFrequency = 100
+StartSize = 2
+EndSize = 20
+
+[[Map.Features]]
+Name = "DeckManaSum"
+
+[[Map.Features]]
+Name = "DeckManaVariance"
+```
