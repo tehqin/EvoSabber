@@ -53,7 +53,7 @@ namespace MapSabber.Mapping
          if (_highGroupBound[featureId] <= feature)
             return NumGroups-1;
 
-         int gap = _highGroupBound[featureId] - _lowGroupBound[featureId] + 1;
+         int gap = _highGroupBound[featureId] - _lowGroupBound[featureId];
          int pos = feature - _lowGroupBound[featureId];
          int index = NumGroups * pos / gap;
          return index;
