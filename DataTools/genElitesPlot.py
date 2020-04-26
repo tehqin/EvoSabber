@@ -27,6 +27,22 @@ logPaths = [
     '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Orig/Control/Hunter',
     '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Orig/Control/Paladin',
     '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Orig/Control/Warlock',
+
+    # Experiment 2
+    '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Elites/Aggro/Hunter',
+    '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Elites/Aggro/Paladin',
+    '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Elites/Aggro/Warlock',
+    '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Elites/Control/Hunter',
+    '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Elites/Control/Paladin',
+    '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Elites/Control/Warlock',
+
+    # Experiment 3
+    '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Nerfed/Control/Paladin',
+    '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Nerfed/Control/Warlock',
+    '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Nerfed/Control/Hunter',
+    '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Nerfed/Aggro/Paladin',
+    '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Nerfed/Aggro/Warlock',
+    '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Nerfed/Aggro/Hunter',
         ]
 
 mapLogFilename = "elite_map_log.csv"
@@ -94,6 +110,7 @@ def buildMultiplePlots():
         logPath = os.path.join(folderPath, mapLogFilename)
         headPath, className = os.path.split(folderPath)
         headPath, strategyType = os.path.split(headPath)
+        headPath, expName = os.path.split(headPath)
 
         with open(logPath, 'r') as csvfile:
             allRows = list(csv.reader(csvfile, delimiter=',', quotechar='|'))
@@ -115,7 +132,7 @@ def buildMultiplePlots():
 
             className = className.lower()
             strategyType = strategyType.lower()
-            imageFilename = 'elites_{}_{}.png'.format(className, strategyType)
+            imageFilename = '{}_{}_{}.png'.format(expName, className, strategyType)
             print(imageFilename)
             fig = g.get_figure()
             fig.tight_layout()

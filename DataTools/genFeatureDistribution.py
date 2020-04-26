@@ -8,12 +8,12 @@ import csv
 import glob
 import seaborn as sns
 
-feature1_index = 12
-feature1_label = 'Average Mana'
-feature1_scalar = 1 / 30.0
-feature2_index = 13
-feature2_label = 'Mana Variance'
-feature2_scalar = 1 / 1000000.0
+feature1_index = 4
+feature1_label = 'Num Turns'
+feature1_scalar = 1 / 1.0
+feature2_index = 6
+feature2_label = 'Hand Size'
+feature2_scalar = 1 / 1.0
 
 logFilename = "individual_log.csv"
 
@@ -54,6 +54,7 @@ def createMovie(folderName, filename):
 
     video.release()
 
+print("STARTING")
 with open(logFilename, "r") as csvfile:
     allRows = list(csv.reader(csvfile, delimiter=',', quotechar='|'))
 

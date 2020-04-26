@@ -44,10 +44,10 @@ logPaths = [
     '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Nerfed/Aggro/Hunter',
         ]
 
-logPaths = [
-    '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Elites/Control/FixedPaladin',
-    '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Elites/Control/FixedPaladin2/',
-        ]
+#logPaths = [
+#    '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Elites/Control/FixedPaladin',
+#    '/home/tehqin/Projects/HearthStone/Experiments/MapElites/Elites/Control/FixedPaladin2/',
+#        ]
 logFilename = "elite_map_log.csv"
 
 def createRecordList(mapData):
